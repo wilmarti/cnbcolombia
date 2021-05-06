@@ -252,7 +252,8 @@ export default {
         optionsDiploma:[
           { value: null, text: 'Por favor seleccione un diploma' },
           { value: '1', text: 'NORMAL' },
-          { value: '2', text: 'HOMIL' }
+          { value: '2', text: 'HOMIL' },
+          { value: '3', text: 'TOMA MUESTRAS DE CITOLOGIA' }
         ],
         SeleccionCursoEstado: null,
         SeleccionDiploma:null,
