@@ -9,9 +9,9 @@
           <b-col md="6">
               <!-- <b-form-input type="number" v-model="id" placeholder="Id"> </b-form-input>
                 <small>Solo se aceptan números</small> -->
-              <b-form-input type="text" v-model="NuevoCurso"  placeholder="Aquí puede ingresar nuevo curso" ></b-form-input>
+              <b-form-input type="text" v-model="NuevoCurso"  placeholder="Aquí puede ingresar nuevo evento" ></b-form-input>
               <div class="mt-2">
-                 <b-button variant="outline-success" v-on:click= "Agregarcurso" >Ingresar Curso</b-button>
+                 <b-button variant="outline-success" v-on:click= "Agregarcurso" >Ingresar Evento</b-button>
               </div>
           </b-col>
         </b-row>
@@ -117,7 +117,7 @@
       <form ref="form" @submit.stop.prevent="handleSubmit">
         <b-form-group
           :state="nameState"
-          label="Descripción del Curso"
+          label="Descripción del Evento"
           label-for="name-input"
           invalid-feedback="Name is required"
         >
@@ -136,6 +136,7 @@
           label-for="estado"
           invalid-feedback="Debe seleccionar el estado del curso"
         >
+  
 
         <b-form-select
         :state="SeleccionCursoEstado" 
@@ -165,15 +166,13 @@
           ></b-form-input>
         </b-form-group>
 
-        <b-form-group
-          
+        <b-form-group          
           label="Diploma Curso:"
           label-for="diploma"
           invalid-feedback="Debe seleccionar diploma del curso"
         >
 
-        <b-form-select
-         
+        <b-form-select         
         v-model="SelectDiploma" 
         id="EstadonDiploma"
         label="Seleccione Diploma:" 
@@ -189,9 +188,46 @@
 
       </b-form-group>
 
+<!--    <label class="mr-sm-2" for="inline-form-custom-select-pref">Tipo Diploma</label>
+     <b-form-select
+      id="inline-form-custom-select-pref"
+      class="mb-2 mr-sm-2 mb-sm-0"
+      :options="optionsDiploma"      
+      :value="null"
+    ></b-form-select>
+    
+       <b-form-input
+            id="inline-form-input-name"
+            class="mb-2 mr-sm-2 mb-sm-0"
+            placeholder="Texto 1">
+      </b-form-input>
+     <b-form-input
+            id="inline-form-input-name"
+            class="mb-2 mr-sm-2 mb-sm-0"
+            placeholder="Tamaño1">
+      </b-form-input>
+      <b-form-input
+            id="inline-form-input-name"
+            class="mb-2 mr-sm-2 mb-sm-0"
+            placeholder="Color1">
+      </b-form-input>
+      <b-form-input
+            id="inline-form-input-name"
+            class="mb-2 mr-sm-2 mb-sm-0"
+            placeholder="Posicion1">
+      </b-form-input>      
+</b-form> -->
+
+
+        
+
       </form>
     </b-modal>
     </div>
+
+    <br/>
+    <br/>
+    <br/>
         
 
     </b-container>
@@ -253,7 +289,9 @@ export default {
           { value: null, text: 'Por favor seleccione un diploma' },
           { value: '1', text: 'NORMAL' },
           { value: '2', text: 'HOMIL' },
-          { value: '3', text: 'TOMA MUESTRAS DE CITOLOGIA' }
+          { value: '3', text: 'TOMA MUESTRAS DE CITOLOGIA' },
+          { value: '4', text: 'CONGRESO CLAHT' }
+           
         ],
         SeleccionCursoEstado: null,
         SeleccionDiploma:null,
@@ -261,7 +299,7 @@ export default {
         SelectDiploma:'',
         columns: [
                   { id: "value", title: "ID", cssClasses: "w3" },
-                  { id: "text", title: "Descripción del curso", cssClasses: "w4" },
+                  { id: "text", title: "Descripción del Evento", cssClasses: "w4" },
                   { id: "ESTADO", title: "Estado", cssClasses: "NroId" },
                   { id: "NumeroHoras", title: "No. Horas", cssClasses: "NroId" },
                   { id: "TipoDiploma", title: "Tipo Diploma", cssClasses: "NroId" }
