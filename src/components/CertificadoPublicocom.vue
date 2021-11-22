@@ -49,7 +49,7 @@
         <!-- <b-col>{{item.nota}}</b-col> -->
         <b-col>{{item.NombreCurso}}</b-col>
         <b-col> <!-- <router-link :to="{name:'certificadopublico',params: {id:item.nombre + '|'+item.TipoId +'|'+ item.NroId + '|' + item.NombreCurso }}"> -->
-            <b-button  @click="downloadWithCSS(item.nombre + '|'+item.TipoId +'|'+ item.NroId + '|' + item.NombreCurso+ '|' + item.NumeroHoras+ '|' + item.TipoDiploma+ '|' + item.FondoDiploma+ '|' + item.Texto1+ '|' + item.Tamaño1+ '|' + item.Color1+ '|' + item.Posicion1+ '|' + item.Texto2+ '|' + item.Tamaño2+ '|' + item.Color2+ '|' + item.Posicion2+ '|' + item.Texto3+ '|' + item.Tamaño3+ '|' + item.Color3+ '|' + item.Posicion3+ '|' + item.Texto4+ '|' + item.Tamaño4+ '|' + item.Color4+ '|' + item.Posicion4+ '|' + item.TamañoNombre+ '|' + item.ColorNombre+ '|' + item.PosicionNombre+ '|' + item.TamañoId+ '|' + item.ColorId+ '|' + item.PosicionId)">Descargar Certificado</b-button>
+            <b-button  @click="downloadWithCSS(item.nombre + '|'+item.TipoId +'|'+ item.NroId + '|' + item.NombreCurso+ '|' + item.NumeroHoras+ '|' + item.TipoDiploma+ '|' + item.FondoDiploma+ '|' + item.Texto1+ '|' + item.Tamaño1+ '|' + item.Color1+ '|' + item.Posicion1+ '|' + item.Texto2+ '|' + item.Tamaño2+ '|' + item.Color2+ '|' + item.Posicion2+ '|' + item.Texto3+ '|' + item.Tamaño3+ '|' + item.Color3+ '|' + item.Posicion3+ '|' + item.Texto4+ '|' + item.Tamaño4+ '|' + item.Color4+ '|' + item.Posicion4+ '|' + item.TamañoNombre+ '|' + item.ColorNombre+ '|' + item.PosicionNombre+ '|' + item.TamañoId+ '|' + item.ColorId+ '|' + item.PosicionId+ '|' + item.TamañoFecha+ '|' + item.ColorFecha+ '|' + item.PosicionFecha)">Descargar Certificado</b-button>
                     <!-- <button v-b-modal.modal-xl class="bg-success text-white " >Descargar Certificado</button> -->
                 <!-- </router-link>  -->
         </b-col>
@@ -120,7 +120,7 @@ export default {
                     nroid: this.nroid
                 }
                 }).then (response =>{
-                    console.log("esta es la prueba:", response.data)
+                    //le.log("esta es la prueba:", response.data)
                     this.DataCertificado = response.data
                 })
                 .catch (e => console.log(e))
@@ -198,38 +198,47 @@ export default {
 
              //Impresion de textos en el diploma
 
-            //NOmbre del estudisnte
-            doc.setFontSize(arrayDatos[23]);
-            doc.setTextColor(arrayDatos[24]);            
-            doc.text(arrayDatos[0],pageCenter,arrayDatos[25],'center'); 
+            //Nombre del estudisnte              
+            if(arrayDatos[0] !== ""){ 
+                doc.setFontSize(arrayDatos[23]);
+                doc.setTextColor(arrayDatos[24]);                     
+                doc.text(arrayDatos[0],pageCenter,arrayDatos[25],'center'); 
+            }
+            //Tipoid y NroId            
+            if(arrayDatos[1] !== ""){
+                doc.setTextColor(arrayDatos[27]);
+                doc.text(arrayDatos[1] +'. '+arrayDatos[2],pageCenter,arrayDatos[28],'center'); 
+            }  
             
-            //Tipoid y NroId
-            doc.setTextColor(arrayDatos[27]);
-            doc.text(arrayDatos[1] +'. '+arrayDatos[2],pageCenter,arrayDatos[28],'center');   
-            doc.setFontSize(10);
-
             /***************************  TEXTO 1 --se imprime *******************************************************/
             doc.setFontSize(arrayDatos[8]);
             doc.setTextColor(arrayDatos[9]); 
-            doc.text(arrayDatos[7],pageCenter,arrayDatos[10], { align: "center", lineHeightFactor: 2, maxWidth: 600 }); 
-           
-            /***************************  TEXTO 2 --se imprime *******************************************************/
-            doc.text(arrayDatos[11],pageCenter,arrayDatos[14], { align: "center", lineHeightFactor: 2, maxWidth: 600 });
+            if(arrayDatos[7] !== ""){
+                doc.text(arrayDatos[7],pageCenter,arrayDatos[10], { align: "center", lineHeightFactor: 2, maxWidth: 600 }); 
+            }
 
+            /***************************  TEXTO 2 --se imprime *******************************************************/
+            if(arrayDatos[11] !== ""){
+                doc.text(arrayDatos[11],pageCenter,arrayDatos[14], { align: "center", lineHeightFactor: 2, maxWidth: 600 });
+            }
             /***************************  TEXTO 3 --se imprime *******************************************************/
-            doc.setFontType("normal");
-            doc.text(arrayDatos[15],pageCenter,arrayDatos[18],'center');  
+            if(arrayDatos[15] !== ""){
+                doc.setFontType("normal");
+                doc.text(arrayDatos[15],pageCenter,arrayDatos[18],'center');  
+            }
 
             /***************************  TEXTO 4 --se imprime *******************************************************/
-             doc.setFontSize(13);
-            if(arrayDatos[5] == 1 || arrayDatos[5] == 3 || arrayDatos[5] == 4 ){
-                console.log("TipoDiploma",arrayDatos[5])
-                doc.text(arrayDatos[19]+arrayDatos[4] + ' horas.',pageCenter,arrayDatos[22],'center'); //see this line
+              //doc.setFontSize(13);
+            //if(arrayDatos[5] == 1 || arrayDatos[5] == 3 || arrayDatos[5] == 4 ){
+            if(arrayDatos[5] != 2){
+                if(arrayDatos[19] !== ""){
+                    doc.text(arrayDatos[19]+arrayDatos[4] + ' horas.',pageCenter,arrayDatos[22],{ align: "center", lineHeightFactor: 2, maxWidth: 600 }); 
+                }
             
-            doc.setTextColor(255, 255, 255);
+            doc.setTextColor(arrayDatos[30]);
             var currentDateWithFormat = new Date().toJSON().slice(0,10).replace(/-/g,'/');
             var fecha = doc.splitTextToSize(currentDateWithFormat, (pdfInMM-lMargin-rMargin));
-            doc.text('Fecha de expedición  '+fecha,pageCenter,580,'center');   
+            doc.text('Fecha de expedición  '+fecha,pageCenter,arrayDatos[31],'center');   
            }   
  
 

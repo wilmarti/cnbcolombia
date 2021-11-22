@@ -568,12 +568,20 @@ export default {
         participanteCurso: [],
         options: [
           { value: null, text: 'Por favor seleccione una opción' },
-          { value: 'CC', text: 'CC - Cedula de Ciudadania' },
-          { value: 'CE', text: 'CC - Cedula de Extranjeria' },
-          { value: 'DNI', text: 'DNI - Documento Nacional Identificación' },
-          { value: 'CI', text: 'CI - Documento de Identidad' },
-          { value: 'CP', text: 'CP - Ced Prof' },
+          { value: 'CC', text: 'CC - Cédula de Ciudadania' },
+          { value: 'CE', text: 'CE - Cédula de Extranjeria' },
+          { value: 'DNI', text:'DNI - Documento Nacional Identificación' },
+          { value: 'DUI', text:'DUI - Documento Único de Identificación' },
+          { value: 'RC', text: 'RC - Registro Civil' },
+          { value: 'CI', text: 'CI - Cédula de Identidad' },
+          { value: 'ID', text: 'ID - Identificación oficial' },
+          { value: 'CP', text: 'CP - Cédula Profesional' },
           { value: 'PA', text: 'PA - Pasaporte' },
+          { value: 'TI', text: 'TI - Tarjeta de Identidad'},
+          { value: 'TP', text: 'TI - Tarjeta Pasaporte'},
+          { value: 'INE', text: 'INE - Instituto Nacional Electoral'},
+          { value: 'CURP', text: 'CURP - Clave Única de Registro de Población'},
+          { value: 'RFC', text: 'RFC - Registro Federal de Contribuyentes'},
         ],
         Tipos: [
           { value: null, text: 'Por favor seleccione una opción' },
@@ -604,7 +612,6 @@ export default {
   },  
   /***************Se ejecuta cuando el componnete se monte */
   mounted(){
-      console.log("montaje participante")
       this.getParticipantes();
       this.getParticipantescombo();
       this.getCursos();      
@@ -695,9 +702,7 @@ export default {
       const strMensaje = 'Está seguro de eliminar el Registro?'
 
             if (confirm(strMensaje)){
-                console.log("antes del axios");
                 axios.delete(`https://cnbcolombia.com/node/ApiACNB/participantes/${idDelete}`).then (response =>{
-                console.log("antes del axios:",idDelete);
 
                 if(response.data.ok)
                 {
@@ -791,7 +796,6 @@ export default {
       /******************************************************************************************************* */
 
       handleSubmitIns() {
-      console.log("holawwww:")
         // Exit when the form isn't valid
         if (!this.checkFormValidityIns()) {
           return
@@ -821,8 +825,7 @@ export default {
 
             if (this.valid){   
                     axios.post('https://cnbcolombia.com/node/ApiACNB/participantes',{t_id,n_id,p_ape,s_ape,p_nom,s_nom,est}).then (response =>{
-                              
-                    console.log("response:", response.data)     
+                                 
 
                     if(response.data.t_id)
                     {
@@ -843,8 +846,7 @@ export default {
           
           
           checkFormValidityIns() {
-              const valid = this.$refs.form2.checkValidity()
-              console.log("checkFormValidity:",valid)       
+              const valid = this.$refs.form2.checkValidity()     
 
               this.TipoId_i = valid
               this.NroId_i = valid
@@ -918,7 +920,6 @@ export default {
         if (this.valid){   
               axios.post('https://cnbcolombia.com/node/ApiACNB/participantes/Inscripcion',{sc,sp}).then (response =>{
                         
-              console.log("response:", response.data)     
 
               if(response.data.sc)
               {
@@ -965,7 +966,7 @@ export default {
         },
         
         listar: function() {
-            console.log("listar", this.inscritos)
+
             return this.participanteCurso.filter((item) => item.NroId.includes(this.buscar));
         },
         items() {

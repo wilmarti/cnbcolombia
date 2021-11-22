@@ -83,7 +83,7 @@ export default {
 
     /***************Se ejecuta cuando el componnete se monte */
     mounted(){
-        console.log("montaje")
+
         this.getCursos();
         this.getParticipantescombo()
     },    
@@ -106,11 +106,9 @@ export default {
             var Curso = this.selected;
 
             if (confirm(strMensaje)){
-                console.log("antes del axios");
 
                 axios.delete(`https://cnbcolombia.com/node/ApiACNB/participantes/DesInscribirParticipante/${TipoId}/${NroId}/${Curso}`).then (response =>{
 
-                console.log(response);
                 if(response.data.ok)
                 {
                 alert("Registro eliminado con éxito");
@@ -130,7 +128,6 @@ export default {
         getCursos(){
         axios.get('https://cnbcolombia.com/node/ApiACNB/cursos').then (response =>{
             this.cursovirtual = response.data
-            console.log(response.data)
         })
         .catch (e => console.log(e))
 
@@ -140,7 +137,6 @@ export default {
         getParticipantescombo(){
         axios.get('https://cnbcolombia.com/node/ApiACNB/participantes/ListaInscritos').then (response =>{
             this.inscritos = response.data
-            console.log("inscritos", this.inscritos )
         })
         .catch (e => console.log(e))
         },        
@@ -178,7 +174,6 @@ export default {
             var paragraph7 = arrayDatos[2];
             var paragraph8 = arrayDatos[3];
             
-            console.log("arrayDatos",arrayDatos)
     
             var otorgado  = doc.splitTextToSize(paragraph, (pdfInMM-lMargin-rMargin));
             var certifica = doc.splitTextToSize(paragraph2, (pdfInMM-lMargin-rMargin));

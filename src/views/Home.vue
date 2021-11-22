@@ -12,7 +12,6 @@
      <login/>
   </div> 
 
-
     
   </div>
 </template>

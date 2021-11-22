@@ -330,7 +330,7 @@ export default {
         this.cursovirtual = response.data
         //console.log("cursos",response.data)
       })
-      .catch (e => console.log("treendo error",e))
+      .catch (e => console.log("error",e))
 
     },
     /*************Methodo que llamar a la API utilizado para eliminar el curso seleccionado */
@@ -404,7 +404,6 @@ export default {
       const strMensaje = 'Está seguro de eliminar el Registro?'
 
             if (confirm(strMensaje)){
-                console.log("antes del axios");
                 axios.delete(`https://cnbcolombia.com/node/ApiACNB/cursos/${idDelete}`).then (response =>{
 
                 //console.log(response);
