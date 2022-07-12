@@ -16,12 +16,14 @@
                     <b-dropdown-item :to="{name:'Home'}" exact>Eventos</b-dropdown-item>
                     <b-dropdown-item :to="{name:'Participante'}">Participantes</b-dropdown-item>
                     <b-dropdown-item  :to="{name:'certificado'}">Filtros</b-dropdown-item>
+                    <b-dropdown-item  :to="{name:'estadisticas'}">Estadisticas Rethus</b-dropdown-item>
                   <!--   <b-dropdown-item  :to="{name:'prueba'}">Prueba</b-dropdown-item> -->
                   </b-nav-item-dropdown>
                   <b-nav-item-dropdown text="Certificaciones Digitales" right>
                     <b-dropdown-item  :to="{name:'certificadopublico'}">Certificados</b-dropdown-item>
                     <b-dropdown-item  :to="{name:'carnetafiliacioncnb'}">Carné Afiliación CNB</b-dropdown-item>                    
-                  </b-nav-item-dropdown>                   
+                  </b-nav-item-dropdown>  
+
 <!-- 
 
                   <b-nav-item  :to="{name:'Home'}" exact>Cursos</b-nav-item>

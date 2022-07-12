@@ -33,8 +33,6 @@
 
 import auth from "@/auth";
 
-console.log("hola")
-
 export default {
   data: () => ({
     email: "",

@@ -18,6 +18,11 @@ Vue.use(VueRouter)
     component: () => import(/* webpackChunkName: "about" */ '../views/Participante.vue')
   },
   {
+    path: '/estadisticas',
+    name: 'estadisticas',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Estadisticas.vue')
+  },
+  {
     path: '/certificado/:id',
     name: 'certificado',
 
