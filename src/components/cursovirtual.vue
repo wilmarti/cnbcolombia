@@ -5,15 +5,15 @@
 
       <b-container>     
       <form>
-        <b-row hover>
-          <b-col md="6">
+        <b-row hover class="m-2">
+          <b-col>
               <!-- <b-form-input type="number" v-model="id" placeholder="Id"> </b-form-input>
                 <small>Solo se aceptan números</small> -->
               <b-form-input type="text" v-model="NuevoCurso"  placeholder="Aquí puede ingresar nuevo evento" ></b-form-input>
-              <div class="mt-2">
+            </b-col>
+              <b-col class="d-flex justify-content-start">
                  <b-button variant="outline-success" v-on:click= "Agregarcurso" >Ingresar Evento</b-button>
-              </div>
-          </b-col>
+              </b-col>
         </b-row>
 
       </form>
@@ -46,8 +46,8 @@
             :class="col.cssClasses"
             :key="col.id">{{ item[col.id] }}  
           </td>
-            <b-button size="sm" variant="outline-success" v-b-modal.modalEdicion @click="EditarCurso(item.value,item.text,item.ESTADO,item.NumeroHoras,item.TipoDiploma)">Editar</b-button>          
-            <b-button size="sm" variant="outline-danger" @click="EliminarCurso(item.value)" >Eliminar</b-button>
+            <b-button class= "m-1" size="sm" variant="outline-success" v-b-modal.modalEdicion @click="EditarCurso(item.value,item.text,item.ESTADO,item.NumeroHoras,item.TipoDiploma)">Editar</b-button>          
+            <b-button class="m-1" size="sm" variant="outline-danger" @click="EliminarCurso(item.value)" >Eliminar</b-button>
 
         </tr>
        <!--  </mdb-tbl-body> -->
@@ -109,13 +109,16 @@
       ref="modal"
       title="Formulario de Edición"
       valor= item.Id_Curso
+      size="xl"
       @show="resetModal"
       @hidden="resetModal"
       @ok="handleOk"
     >
-     <!-- Hello {{IdEdicion}} -->
-      <form ref="form" @submit.stop.prevent="handleSubmit">
-        <b-form-group
+    <!-- Hello {{IdEdicion}} -->
+    <form ref="form" @submit.stop.prevent="handleSubmit">
+      <main class="row">
+        <div class="row g-2">
+        <b-form-group class="col-sm m-2"
           :state="nameState"
           label="Descripción del Evento"
           label-for="name-input"
@@ -130,13 +133,12 @@
         </b-form-group>
 
         <!-- seleccion de curso -->
-        <b-form-group
+        <b-form-group class="col-sm m-2"
           :state="SeleccionCursoEstado"
           label="Estado Curso:"
           label-for="estado"
           invalid-feedback="Debe seleccionar el estado del curso"
         >
-  
 
         <b-form-select
         :state="SeleccionCursoEstado" 
@@ -151,22 +153,11 @@
               <b-form-select-option :value="null" disabled>-- Por favor seleccione un estado --</b-form-select-option>
           </template>  
         </b-form-select>
-
-        <b-form-group
-          :state="nameHora"
-          label="Horas del Curso"
-          label-for="name-input"
-          invalid-feedback="Name is required"
-        >
-          <b-form-input
-            id="name-input"
-            v-model="nameEditarHoras"
-            :state="nameHora"
-            required
-          ></b-form-input>
         </b-form-group>
-
-        <b-form-group          
+        </div>
+        <!--Diploma curso-->
+        <div class="row g-2">
+        <b-form-group class="col-sm m-2"         
           label="Diploma Curso:"
           label-for="diploma"
           invalid-feedback="Debe seleccionar diploma del curso"
@@ -186,7 +177,67 @@
         </b-form-select>
         </b-form-group>
 
-      </b-form-group>
+        <!--Elegir archivo-->
+        <b-form-group class="col-sm m-2"         
+          label="Cargar Imagen:"
+          label-for="elegirArchivo"          
+        >
+
+        <b-form-file 
+        id="elegirArchivo"
+        label="Seleccione Diploma:" 
+        descripcion="Cargue una imagen de diploma"
+        accept="image/*"
+        :state="Boolean"
+        @change="cargaImagen" 
+        required
+        >
+          <template v-slot:first>
+              <b-form-select-option :value="null" disabled>-- Por favor seleccione un diploma --</b-form-select-option>
+          </template>  
+        </b-form-file>
+        </b-form-group>
+
+      </div>
+        <!--Horas del curso-->
+        <div class="row g-2">
+        <b-form-group class="col-sm m-2"
+          :state="nameHora"
+          label="Horas del Curso"
+          label-for="name-input"
+          invalid-feedback="Name is required"
+        >
+          <b-form-input
+            id="name-input"
+            v-model="nameEditarHoras"
+            :state="nameHora"
+            required
+          ></b-form-input>
+        </b-form-group>
+
+        <!-- Selección de texto a configurar-->
+        <b-form-group class="col-sm m-2"
+        id="confiText"         
+          label="Seleccione Texto a configurar:"
+          label-for="inputconfiText"
+          
+        >
+
+        <b-form-select         
+        v-model="SelectedText" 
+        id="inputconfiText"
+        :options="optionConfiText" 
+        required
+        >
+          <template v-slot:first>
+              <b-form-select-option :value="null" disabled>-- Por favor seleccione un diploma --</b-form-select-option>
+          </template>  
+        </b-form-select>
+        </b-form-group>
+
+      </div>
+      
+      
 
 <!--    <label class="mr-sm-2" for="inline-form-custom-select-pref">Tipo Diploma</label>
      <b-form-select
@@ -221,6 +272,7 @@
 
         
 
+      </main>
       </form>
     </b-modal>
     </div>
