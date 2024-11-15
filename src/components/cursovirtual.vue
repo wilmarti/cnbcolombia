@@ -242,6 +242,7 @@ import {mapState,mapMutations} from 'vuex'
 import axios from 'axios'
 import { mdbScrollbar,mdbTbl, mdbTblHead, mdbTblBody } from 'mdbvue';
 import VueScrollingTable from "vue-scrolling-table"
+export const RUTA_SERVIDOR = process.env.VUE_APP_RUTA_API;
 
 
 const $ = require('jquery')
@@ -274,6 +275,7 @@ export default {
         age: null,
         movie: null,
         cursovirtual: null,
+        ListDiplomas:null,
         nameState: null,
         submittedNames: [],
         IdEdicion: '',
@@ -285,14 +287,15 @@ export default {
           { value: '1', text: 'ACTIVO' },
           { value: '0', text: 'INACTIVO' }
         ],  
-        optionsDiploma:[
+        optionsDiploma:[],
+/*         optionsDiploma:[
           { value: null, text: 'Por favor seleccione un diploma' },
           { value: '1', text: 'NORMAL' },
           { value: '2', text: 'HOMIL' },
           { value: '3', text: 'TOMA MUESTRAS DE CITOLOGIA' },
-          { value: '4', text: 'CONGRESO CLAHT' }
-           
-        ],
+          { value: '4', text: 'CONGRESO CLAHT' }           
+        ], */
+
         SeleccionCursoEstado: null,
         SeleccionDiploma:null,
         SelectEstado:'',
@@ -312,6 +315,7 @@ export default {
       //process.env.ApiUrl= "https://cnbcolombia.com/node/ApiACNB//api/" 
       //console.log("montaje",env.ApiUrl)
       this.getCursos();
+      this.getDiplomas();
   },
 
    methods:{
@@ -322,11 +326,20 @@ export default {
         this.nameHora = null
         this.SeleccionDiploma = null
 
-     },     
+     },  
+     
+     getDiplomas(){
+      axios.get(process.env.VUE_APP_API_URL+"/ListaDiploma").then (response =>{
+        this.ListDiplomas = response.data
+        this.optionsDiploma = response.data
+        console.log("ListDiplomas",response.data)
+      })
+      .catch (e => console.log("error",e))     
+     },
 
     /*************Methodo que llama la API para llenar array de cursos virtuales del CNB */
     getCursos(){
-      axios.get('https://cnbcolombia.com/node/ApiACNB/cursos').then (response =>{
+      axios.get(process.env.VUE_APP_API_URL).then (response =>{
         this.cursovirtual = response.data
         //console.log("cursos",response.data)
       })
@@ -335,7 +348,7 @@ export default {
     },
     /*************Methodo que llamar a la API utilizado para eliminar el curso seleccionado */
     AñadirCursos(NuevoCurso){
-      axios.post('https://cnbcolombia.com/node/ApiACNB/cursos',{NuevoCurso}).then (response =>{
+      axios.post(process.env.VUE_APP_API_URL,{NuevoCurso}).then (response =>{
           
           //console.log(response)
 
