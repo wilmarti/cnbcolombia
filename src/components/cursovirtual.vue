@@ -11,8 +11,8 @@
                 <small>Solo se aceptan números</small> -->
               <b-form-input type="text" v-model="NuevoCurso"  placeholder="Aquí puede ingresar nuevo evento" ></b-form-input>
             </b-col>
-              <b-col class="d-flex justify-content-start">
-                 <b-button variant="outline-success" v-on:click= "Agregarcurso" >Ingresar Evento</b-button>
+              <b-col class="d-flex justify-content-start" sm="auto">
+                 <b-button pill variant="outline-success" v-on:click= "Agregarcurso" >Ingresar Evento</b-button>
               </b-col>
         </b-row>
 
@@ -46,9 +46,10 @@
             :class="col.cssClasses"
             :key="col.id">{{ item[col.id] }}  
           </td>
+          <td>
             <b-button class= "m-1" size="sm" variant="outline-success" v-b-modal.modalEdicion @click="EditarCurso(item.value,item.text,item.ESTADO,item.NumeroHoras,item.TipoDiploma)">Editar</b-button>          
             <b-button class="m-1" size="sm" variant="outline-danger" @click="EliminarCurso(item.value)" >Eliminar</b-button>
-
+          </td>
         </tr>
        <!--  </mdb-tbl-body> -->
       </template>
@@ -162,13 +163,13 @@
           label-for="diploma"
           invalid-feedback="Debe seleccionar diploma del curso"
         >
-
         <b-form-select         
-        v-model="SelectDiploma" 
+        v-model="Diploma" 
         id="EstadonDiploma"
         label="Seleccione Diploma:" 
         descripcion="diploma"
         :options="optionsDiploma" 
+        @change="CambiaDiploma"
         required
         >
           <template v-slot:first>
@@ -178,19 +179,15 @@
         </b-form-group>
 
         <!--Elegir archivo-->
-        <b-form-group class="col-sm m-2"         
-          label="Cargar Imagen:"
-          label-for="elegirArchivo"          
-        >
+        <b-form-group class="col-sm m-2"  label="Cargar Imagen:" label-for="elegirArchivo">
 
         <b-form-file 
         id="elegirArchivo"
         label="Seleccione Diploma:" 
         descripcion="Cargue una imagen de diploma"
         accept="image/*"
-        :state="Boolean"
         @change="cargaImagen" 
-        required
+        
         >
           <template v-slot:first>
               <b-form-select-option :value="null" disabled>-- Por favor seleccione un diploma --</b-form-select-option>
@@ -226,51 +223,406 @@
         <b-form-select         
         v-model="SelectedText" 
         id="inputconfiText"
-        :options="optionConfiText" 
+        :state=Boolean(SelectedText)
+        :options="optionConfiTexto" 
         required
         >
           <template v-slot:first>
-              <b-form-select-option :value="null" disabled>-- Por favor seleccione un diploma --</b-form-select-option>
+              <b-form-select-option :value="null" disabled>-- Por favor seleccione un campo a configuar --</b-form-select-option>
           </template>  
         </b-form-select>
         </b-form-group>
-
       </div>
+
+          <b-row>
+            <!-- ****** VISTA PREVIA***-->
+              
+                <div class="card text-sm-center mb-5 text-wrap">
+                  <!-- <div v-if ="imagenSeleccionada">
+                    <img 
+                      class="card-img" 
+                      :src="SelectDiploma" 
+                      alt="certificado"
+                      >              
+                  </div> -->
+               
+                <!--Asegura que solo se muestra la imagen seleccionada desde el input de tipo file si SelectDiploma es una URL de datos (Data URL).-->
+                <div v-if="typeof SelectDiploma === 'string' && SelectDiploma.startsWith('data:image/')">
+                  <img 
+                  m
+                  class="card-img" 
+                  :src="SelectDiploma" 
+                  alt="certificado seleccionada" 
+                  >
+                </div>                
+                <!-- Muestra la imagen de fondo -->
+                  <div class="card-img-overlay">              
+                    <!-- Parrafo nombre curso-->
+                    <p :style="textStyle(formData.ColorNombre, formData.TamañoNombre, formData.PosicionNombre)">
+                      {{ formData.NombreCurso }}
+                    </p>
+                    
+                    <!-- Otros párrafos -->
+                    <p :style="textStyle(formData.ColorCedula, formData.TamañoCedula, formData.PosicionCedula)">
+                      {{ formData.Cedula }}
+                    </p>
+                    <p :style="textStyle(formData.Color1, formData.Tamaño1, formData.Posicion1)">
+                      <small>{{ formData.Texto1 }}</small>
+                    </p>
+                    <p :style="textStyle(formData.Color2, formData.Tamaño2, formData.Posicion2)">
+                      <small>{{ formData.Texto2 }}</small>
+                    </p>
+                    <p :style="textStyle(formData.Color3, formData.Tamaño3, formData.Posicion3)">
+                      <small>{{ formData.Texto3 }}</small>
+                    </p>
+                    <p :style="textStyle(formData.Color4, formData.Tamaño4, formData.Posicion4)">
+                      <small>{{ formData.Texto4 }}</small>
+                    </p>
+                    <p :style="textStyle(formData.ColorFecha, formData.TamañoFecha, formData.PosicionFechaY, formData.PosicionFechaX)">
+                      <small>{{ formData.Fecha }}</small>
+                    </p>             
+                  </div>
+                </div>                
+              
+                    <!-- ******** FORMULARIO CONFIGURACION TEXTO DIPLOMA**********-->
+              <b-col>
+                <form ref="form" @submit.stop.prevent="handleSubmit">
+                <!-- Formulario Inputs Nombre -->
+                <div v-if = "SelectedText === 'nombre'">
+                  <b-form-group
+                    label="Nombre Curso:"
+                    label-for="NombreCurso"
+                    >                  
+                    <b-form-input
+                      id="NombreCurso"
+                      placeholder="Escriba Nombre Curso..."
+                      v-model="formData.NombreCurso"
+                      :state=Boolean(formData.NombreCurso)
+                      required
+                      >
+                    </b-form-input>
+                  </b-form-group>
+                  
+                  <div class="form-group">
+                    <label for="color" class="form-label">Color:</label>
+                    <input
+                      class="form-control form-control-color m-3"
+                      type="color"
+                      id="color"
+                      placeholder="Configurar Texto"
+                      v-model="formData.ColorNombre"
+                    >
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="fontSize">Tamaño de letra:</label>
+                    <input
+                      class="form-range"
+                      type="range"
+                      min="20"
+                      max="60"
+                      id="fontSize"
+                      v-model="formData.TamañoNombre"
+                    >
+                  </div>            
+                  <div class="form-group">
+                    <label for="position">Posición:</label>
+                    <input
+                      class="form-range"
+                      type="range"
+                      min="100"
+                      max="900"
+                      id="position"
+                      v-model="formData.PosicionNombre"
+                    >
+                  </div>
+                </div>
+                <!-- Formulario Inputs Identificación -->
+                <div v-if="SelectedText === 'identi'">
+                  <div class="form-group">
+                    <label class="form-label" for="cedula">Cédula:</label>
+                    <input
+                      class="form-control"
+                      type="number"
+                      placeholder="Escriba Identificación..."
+                      v-model="formData.Cedula"
+                      :state=Boolean(formData.Cedula)
+                    >
+                  </div>
+                  <div class="form-group">
+                    <label for="colorId" class="form-label">Color:</label>
+                    <input
+                      class="form-control form-control-color m-3"
+                      type="color"
+                      id="colorIdenti"
+                      placeholder="Configurar Texto"
+                      v-model="formData.ColorCedula"                      >
+                    </div>
+                  <div class="form-group">
+                    <label class="form-label" for="fontSizeId">Tamaño de letra:</label>
+                    <input
+                      class="form-range"
+                      type="range"
+                      min="20"
+                      max="60"
+                      id="fontSizeIdenti"
+                      v-model="formData.TamañoCedula"
+                      >
+                    </div>
+                  <div class="form-group">
+                    <label for="positionIdenti">Posición:</label>
+                    <input
+                      class="form-range"
+                      type="range"
+                      min="100"
+                      max="900"
+                      id="positionIdenti"
+                      v-model="formData.PosicionCedula"
+                      >
+                    </div>
+                  </div>
+                <!-- Formulario Input Fecha -->
+                <div v-if="SelectedText === 'fecha'">
+                  <div class="form-group">
+                    <label for="date">Fecha:</label>
+                    <input
+                      class="form-control"
+                      type="date"
+                      id="date"
+                      v-model="formData.Fecha"
+                    >
+                  </div>
+                  <div class="form-group">
+                    <label for="colorFecha" class="form-label">Color:</label>
+                    <input
+                      class="form-control form-control-color m-3"
+                      type="color"
+                      id="colorFecha"
+                      placeholder="Configurar Texto"
+                      v-model="formData.ColorFecha"
+                    >
+                    <div class="form-group">
+                      <label class="form-label" for="fontSizeFecha">Tamaño de letra:</label>
+                      <input
+                        class="form-range"
+                        type="range"
+                        min="15"
+                        max="60"
+                        id="fontSizeFecha"
+                        v-model="formData.TamañoFecha"
+                      >
+                    </div>            
+                  </div>
+                  <div class="form-group">
+                    <label for="positionFecha">Posición Vertical:</label>
+                    <input
+                      class="form-range"
+                      min="250"
+                      max="900"
+                      type="range"
+                      id="positionFecha"
+                      v-model="formData.PosicionFechaY"
+                    >
+                  </div>
+                  <div class="form-group">
+                    <label for="positionFecha">Posición Horizontal:</label>
+                    <input
+                      class="form-range"
+                      type="range"
+                      id="positionFecha"
+                      v-model="formData.PosicionFechaX"
+                    >
+                  </div>
+                </div>
+                <!-- Formulario Input Texto1 -->
+                <div v-if="SelectedText === 'texto1'">
+                    <div class="form-group">
+                      <label for="Texto1">Texto 1:</label>
+                      <input
+                        class="form-control"
+                        type="text"
+                        id="Texto1"
+                        v-model="formData.Texto1"
+                        :state=Boolean(formData.Texto1)
+                      >
+                    </div>
+                    <div class="form-group">
+                      <label for="colorTexto1" class="form-label">Color:</label>
+                      <input
+                        class="form-control form-control-color m-3"
+                        type="color"
+                        id="colorTexto1"
+                        placeholder="Configurar Texto"
+                        v-model="formData.Color1"
+                      >
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="fontSizeTexto1">Tamaño de letra:</label>
+                      <input
+                        class="form-range"
+                        type="range"
+                        min="20"
+                        max="60"
+                        id="fontSizeTexto1"
+                        v-model="formData.Tamaño1"
+                      >
+                    </div>
+                    <div class="form-group">
+                      <label for="positionTexto1">Posición:</label>
+                      <input
+                        class="form-range"
+                        type="range"
+                        min="250"
+                        max="900"
+                        id="positionTexto1"
+                        v-model="formData.Posicion1"
+                      >
+                      <input
+                        class="form-control"
+                        type="input"
+                        id="positionTexto1"
+                        v-model="formData.Posicion1"
+                      >
+                    </div>
+                  </div>
+                <!-- Formulario Input Texto2 --> 
+                <div v-if="SelectedText === 'texto2'">
+                    <div class="form-group">
+                      <label for="Texto1">Texto 2:</label>
+                      <input
+                        class="form-control"
+                        type="text"
+                        id="Texto2"
+                        v-model="formData.Texto2"
+                        :state=Boolean(formData.Texto2)
+                      >
+                    </div>
+                    <div class="form-group">
+                      <label for="colorTexto2" class="form-label">Color:</label>
+                      <input
+                        class="form-control form-control-color m-3"
+                        type="color"
+                        id="colorTexto2"
+                        placeholder="Configurar Texto"
+                        v-model="formData.Color2"                      >
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="fontSizeTexto1">Tamaño de letra:</label>
+                      <input
+                        class="form-range"
+                        type="range"
+                        min="20"
+                        max="60"
+                        id="fontSizeTexto1"
+                        v-model="formData.Tamaño2"
+                      >
+                    </div>
+                    <div class="form-group">
+                      <label for="positionTexto2">Posición:</label>
+                      <input
+                        class="form-range"
+                        type="range"
+                        min="300"
+                        max="900"
+                        id="positionTexto2"
+                        v-model="formData.Posicion2"
+                      >
+                    </div>
+                </div>
+                        <!-- Formulario Input Texto3 -->
+                    <div v-if="SelectedText === 'texto3'">
+                    <div class="form-group">
+                      <label for="Texto3">Texto 3:</label>
+                      <input
+                        class="form-control"
+                        type="text"
+                        id="Texto1"
+                        v-model="formData.Texto3"
+                        :state=Boolean(formData.Texto3)
+                      >
+                    </div>
+                    <div class="form-group">
+                      <label for="colorTexto3" class="form-label">Color:</label>
+                      <input
+                        class="form-control form-control-color m-3"
+                        type="color"
+                        id="colorTexto3"
+                        placeholder="Configurar Texto"
+                        v-model="formData.Color3"
+                      >
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="fontSizeTexto3">Tamaño de letra:</label>
+                      <input
+                        class="form-range"
+                        type="range"
+                        min="20"
+                        max="60"
+                        id="fontSizeTexto3"
+                        v-model="formData.Tamaño3"
+                      >
+                    </div>
+                    <div class="form-group">
+                      <label for="positionTexto3">Posición:</label>
+                      <input
+                        class="form-range"
+                        type="range"
+                        min="300"
+                        max="900"
+                        id="positionTexto3"
+                        v-model="formData.Posicion3"
+                      >
+                    </div>
+                  </div> 
+                   <!-- Formulario Input Texto4 -->
+                   <div v-if="SelectedText === 'texto4'">
+                    <div class="form-group">
+                      <label for="Texto4">Texto 4:</label>
+                      <input
+                        class="form-control"
+                        type="text"
+                        id="Texto1"
+                        v-model="formData.Texto4"
+                        :state=Boolean(formData.Texto4)
+                      >
+                    </div>
+                    <div class="form-group">
+                      <label for="colorTexto4" class="form-label">Color:</label>
+                      <input
+                        class="form-control form-control-color m-3"
+                        type="color"
+                        id="colorTexto4"
+                        placeholder="Configurar Texto"
+                        v-model="formData.Color4"
+                      >
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="fontSizeTexto4">Tamaño de letra:</label>
+                      <input
+                        class="form-range"
+                        type="range"
+                        min="20"
+                        max="60"
+                        id="fontSizeTexto4"
+                        v-model="formData.Tamaño4"
+                      >
+                    </div>
+                    <div class="form-group">
+                      <label for="positionTexto4">Posición:</label>
+                      <input
+                        class="form-range"
+                        type="range"
+                        min="300"
+                        max="900"
+                        id="positionTexto4"
+                        v-model="formData.Posicion4"
+                      >
+                    </div>
+                  </div>         
+                </form>      
+              </b-col>
+          </b-row>
       
       
-
-<!--    <label class="mr-sm-2" for="inline-form-custom-select-pref">Tipo Diploma</label>
-     <b-form-select
-      id="inline-form-custom-select-pref"
-      class="mb-2 mr-sm-2 mb-sm-0"
-      :options="optionsDiploma"      
-      :value="null"
-    ></b-form-select>
-    
-       <b-form-input
-            id="inline-form-input-name"
-            class="mb-2 mr-sm-2 mb-sm-0"
-            placeholder="Texto 1">
-      </b-form-input>
-     <b-form-input
-            id="inline-form-input-name"
-            class="mb-2 mr-sm-2 mb-sm-0"
-            placeholder="Tamaño1">
-      </b-form-input>
-      <b-form-input
-            id="inline-form-input-name"
-            class="mb-2 mr-sm-2 mb-sm-0"
-            placeholder="Color1">
-      </b-form-input>
-      <b-form-input
-            id="inline-form-input-name"
-            class="mb-2 mr-sm-2 mb-sm-0"
-            placeholder="Posicion1">
-      </b-form-input>      
-</b-form> -->
-
-
-        
 
       </main>
       </form>
@@ -311,6 +663,7 @@ export default {
   data(){
       return {
       //caracteristicas del scroll
+      Diploma:"",
       scrollVertical: true,
 			scrollHorizontal: true,
 			syncHeaderScroll: true,
@@ -320,6 +673,47 @@ export default {
 			maxRows: 100,
       freezeFirstColumn: false,
       //
+      //v-model formulario
+      formData: {        
+        NombreCurso: '',
+        TamañoNombre:'20',
+        ColorNombre:'#000000',
+        PosicionNombre:'0',
+        //******** */
+        Cedula:'',
+        TamañoCedula:'20',
+        ColorCedula:'#000000',
+        PosicionCedula:'0',
+        /********* */
+        Fecha:'',
+        TamañoFecha:'20',
+        ColorFecha:'#000000',
+        PosicionFechaY:'0',
+        PosicionFechaX:'0',
+        /********* */ 
+        Texto1: '',
+        Tamaño1: '20',
+        Color1: '#000000',
+        Posicion1: '0',
+        /********* */
+        Texto2: '',
+        Tamaño2: '20',
+        Color2: '#000000',
+        Posicion2: '0',
+        /********* */
+        Texto3: '',
+        Tamaño3: '20',
+        Color3: '#000000',
+        Posicion3: '0',
+        /********* */
+        /********* */
+        Texto4: '',
+        Tamaño4: '20',
+        Color4: '#000000',
+        Posicion4: '0',
+        /********* */        
+        FondoDiploma:[],
+      },
         id:'',
         NuevoCurso:'',
         errors: [],
@@ -333,6 +727,15 @@ export default {
         IdEdicion: '',
         nameEditar:'',
         nameEditarHoras:'',
+        SeleccionCursoEstado: null,
+        SeleccionDiploma:null,
+        SelectEstado:'',
+        SelectedText: null,
+        valid:false,
+        optionsDiploma:[],
+        SelectDiploma:null,
+        FondoImg:"",
+        CodigoDiploma:0,
         valid:false,
         options: [
           { value: null, text: 'Por favor seleccione una opción' },
@@ -348,10 +751,7 @@ export default {
           { value: '4', text: 'CONGRESO CLAHT' }           
         ], */
 
-        SeleccionCursoEstado: null,
-        SeleccionDiploma:null,
-        SelectEstado:'',
-        SelectDiploma:'',
+        
         columns: [
                   { id: "value", title: "ID", cssClasses: "w3" },
                   { id: "text", title: "Descripción del Evento", cssClasses: "w4" },
@@ -359,7 +759,17 @@ export default {
                   { id: "NumeroHoras", title: "No. Horas", cssClasses: "NroId" },
                   { id: "TipoDiploma", title: "Tipo Diploma", cssClasses: "NroId" }
                  ],
-        nameHora:null
+        nameHora:null,
+        optionConfiTexto:[
+        {value: null, text: "Seleccione Texto", disabled: true},
+        {value:"nombre",text: "Nombre"},
+        {value:"identi",text: "Identificación"},
+        {value:"texto1",text: "Texto1"},
+        {value:"texto2",text: "Texto2"},
+        {value:"texto3",text: "Texto3"},
+        {value:"texto4",text: "Texto4"},
+        {value:"fecha",text:"Fecha"},
+       ],
       }
   },  
   /***************Se ejecuta cuando el componnete se monte */
@@ -393,7 +803,7 @@ export default {
     getCursos(){
       axios.get(process.env.VUE_APP_API_URL).then (response =>{
         this.cursovirtual = response.data
-        //console.log("cursos",response.data)
+        console.log("cursos",response.data)
       })
       .catch (e => console.log("error",e))
 
@@ -442,7 +852,10 @@ export default {
         this.IdEdicion = index      
         this.nameEditar = text
         this.nameEditarHoras = Horas
-        this.SeleccionDiploma= diploma
+        this.Diploma= diploma
+
+        this.CambiaDiploma()
+        
 
         if(estado =="ACTIVO"){
           this.SelectEstado = 1
@@ -452,13 +865,13 @@ export default {
 
         
 
-/*       this.IdEdicion = index
-      axios.get(`https://cnbcolombia.com/node/ApiACNB//api/cursos/${index}`).then (response =>{
-        this.nameEditar = response.data[0].NombreCurso
-        this.SelectEstado = response.data[0].Estado
-        console.log("respuesta",response)
-      })
-      .catch (e => console.log(e)) */
+          /*       this.IdEdicion = index
+                axios.get(`https://cnbcolombia.com/node/ApiACNB//api/cursos/${index}`).then (response =>{
+                  this.nameEditar = response.data[0].NombreCurso
+                  this.SelectEstado = response.data[0].Estado
+                  console.log("respuesta",response)
+                })
+                .catch (e => console.log(e)) */
 
 
     },
@@ -504,33 +917,121 @@ export default {
 
 
       handleOk(bvModalEvt) {
+        
       // se realiza la edicion del curso
       const DesEditar = this.nameEditar
       const EstadoEditar = this.SelectEstado
       const HorasEditar = this.nameEditarHoras
-      const TipoDiploma = this.SelectDiploma
+      const TipoDiploma = this.Diploma
+      const ImgFondoDiploma = this.CodigoDiploma 
+      const NombreDiplomaSelect = this.NombreDiploma
+      //--
+      const Te1 = this.formData.Texto1
+      const Ta1 = this.formData.Tamaño1
+      const Po1 = this.formData.Posicion1
+      const Co1 = this.formData.Color1
+      //--
+      //--
+      const Te2 = this.formData.Texto2
+      const Ta2 = this.formData.Tamaño2
+      const Po2 = this.formData.Posicion2
+      const Co2 = this.formData.Color2
+      //--
+      //--
+      const Te3 = this.formData.Texto3
+      const Ta3 = this.formData.Tamaño3
+      const Po3 = this.formData.Posicion3
+      const Co3 = this.formData.Color3
 
+      
+      const Te4 = this.formData.Texto4
+      const Ta4 = this.formData.Tamaño4
+      const Po4 = this.formData.Posicion4
+      const Co4 = this.formData.Color4      
+      //--      
+      //--
+      //const NomCur = formData.NombreCurso
+      const TaNom = this.formData.TamañoNombre
+      const PoNom = this.formData.PosicionNombre
+      const CoNom = this.formData.ColorNombre
+      //--
+      //--
+      //const Cedu = formData.Cedula
+      const TaCedu = this.formData.TamañoCedula
+      const PoCedu = this.formData.PosicionCedula
+      const CoCedu = this.formData.ColorCedula
+      //--
+      //--
+      //const Fec2 = formData.Fecha
+      const TaFec2 = this.formData.TamañoFecha
+      const PoFec2 = this.formData.PosicionFechaY
+      const CoFec2 = this.formData.ColorFecha
+      //--
+
+      
+      
+      
         // Prevent modal from closing
         bvModalEvt.preventDefault()
         // Trigger submit handler
         this.handleSubmit()
 
-        if (this.valid){ 
+        if (this.valid) {
+    console.log("Validación pasada, procesando actualización...");
 
-            axios.put(`https://cnbcolombia.com/node/ApiACNB/cursos/${this.IdEdicion}`,{DesEditar,EstadoEditar,HorasEditar,TipoDiploma}).then (response =>{
-            if(response.data.ok)
-            {
-              alert("Registro editado con éxito");
-              this.getCursos(); 
-             
-            }else{
-              //console.log("error edicion",response)
-              alert("Error al tratar de editar el registro");
-            } 
+    const payload = {
+        DesEditar: DesEditar,
+        EstadoEditar: EstadoEditar,
+        HorasEditar: HorasEditar,
+        TipoDiploma: TipoDiploma,
+        NombreDiploma: NombreDiplomaSelect,
+        Texto1:Te1,
+        Tamaño1:Ta1,
+        Color1:Co1,
+        Posicion1:Po1,
+        Texto2:Te2,
+        Tamaño2 :Ta2,
+        Color2:Co2,
+        Posicion2:Po2,
+        Texto3:Te3,
+        Tamaño3 :Ta3,
+        Color3:Co3,
+        Posicion3:Po3,
+        TamañoNombre:TaNom,
+        ColorNombre:CoNom,
+        PosicionNombre:PoNom,
+        TamañoId:TaCedu,
+        ColorId:CoCedu,
+        PosicionId:PoCedu,
+        Texto4:Te4,
+        Tamaño4:Ta4,
+        Color4:Co4,
+        Posicion4:Po4,
+        TamañoFecha:TaFec2,
+        ColorFecha:CoFec2,
+        PosicionFecha:PoFec2
+
+    };
+ console.log ("payload:",payload)
+    axios
+        .put(`https://cnbcolombia.com/node/ApiACNB/cursos/${this.IdEdicion}`, payload)
+            .then((response) => {
+                if (response.data.ok) {
+                    console.log("Actualización exitosa.");
+                    alert("Registro editado con éxito.");
+                    this.getCursos(); // Actualiza la lista de cursos
+                } else {
+                    console.error("Error en la respuesta del servidor:", response);
+                    alert("Error al tratar de editar el registro.");
+                }
             })
-            .catch (e => console.log("esta errado:",e)) 
-
-        }
+            .catch((error) => {
+                console.error("Error en la solicitud:", error.message || error);
+                alert("Ocurrió un error al intentar editar el registro. Verifica la conexión o intenta más tarde.");
+            });
+    } else {
+        console.warn("Validación fallida, no se puede continuar con la actualización.");
+    }
 
 
       },
@@ -547,7 +1048,63 @@ export default {
         })
       },    
 
-  },
+      cargaImagen(event) {
+        const file = event.target.files[0];//Captura el primer archivo seleccionado en el input de tipo file.
+        if (file) {
+          const reader = new FileReader(); //Crea una instancia de FileReader, que se utiliza para leer el contenido del archivo.(FileReader) convierte la imagen en base 64
+          reader.onload = (e) => {    //función que se ejecuta cuando el FileReader ha terminado de leer el archivo.
+            const newImageUrl = e.target.result;//contiene la URL de datos (Data URL) del archivo leído, que es una cadena en formato base64 que representa la imagen.
+            this.imgSelect = newImageUrl;//Asigna la URL para ser utilizada
+            this.optionsDiploma.push({ value: newImageUrl, text: file.name });
+
+            this.SelectDiploma = newImageUrl;
+          };
+          reader.readAsDataURL(file); //Inicia la lectura del archivo como una URL de datos (Data URL).
+        }
+      },
+      textStyle(color, size, top, left = 0) {
+      return {
+        color: color,
+        fontSize: size + 'px',
+        position: 'relative',
+        top: top + 'px',
+        left: left + 'px'
+      };
+    },
+     // Función para guardar la imagen
+     saveImage() {
+
+      alert("Hola")
+/*       const element = this.$refs.imageContainer;
+
+      // Utilizar html2canvas para capturar el DOM
+      html2canvas(element).then(canvas => {
+        // Convertir el canvas en una imagen en formato base64
+        const imageUrl = canvas.toDataURL('image/png');
+
+        // Crear un enlace para descargar la imagen
+        const link = document.createElement('a');
+        link.href = imageUrl;
+        link.download = 'certificado.png';
+        link.click();
+        console.log(link.download)
+      }); */
+    },
+
+    CambiaDiploma(){
+
+      this.SelectDiploma = this.Diploma
+
+      this.FondoImg = this.ListDiplomas.filter((item) => item.value ===this.SelectDiploma)
+      this.SelectDiploma = this.FondoImg[0].FondoDiploma
+      this.CodigoDiploma = this.FondoImg[0].value
+      this.NombreDiploma = this.FondoImg[0].text
+
+      console.log("valor:",this.CodigoDiploma, "Nombre:",this.NombreDiploma)
+    },
+    
+    },
+
       computed:{
         ValidarInputNumerico(){
           return this.id.text = '' ? false : true
@@ -591,9 +1148,9 @@ table.scrolling .nombres {
 	max-width: 9em;
 }
 table.scrolling .action {
-	width: 12em;
-	min-width: 12em;
-	max-width: 12em;
+	width: 10em;
+	min-width: 10em;
+	max-width: 10em;
 }
 
 
