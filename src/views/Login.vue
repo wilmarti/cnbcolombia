@@ -1,8 +1,9 @@
 <template>
   <div class="login">
     <h1 class="title">Autenticación Requerida</h1>
-    <form action class="form" @submit.prevent="login">
-      <label class="form-label" for="#email">Email:</label>
+    
+    <form class="form" @submit.prevent="login">
+      <label class="form-label" for="email">Email:</label>
       <input
         v-model="email"
         class="form-input"
@@ -11,50 +12,78 @@
         required
         placeholder="Email"
       >
-      <label class="form-label" for="#password">Password:</label>
+      
+      <label class="form-label" for="password">Password:</label>
       <input
         v-model="password"
         class="form-input"
         type="password"
         id="password"
+        required
         placeholder="Password"
       >
-      <p v-if="error" class="error">Has introducido mal el email o la contraseña.</p>
+      
+      <p v-if="error" class="error">
+        {{ errorMessage || 'Has introducido mal el email o la contraseña.' }}
+      </p>
+      
       <input class="form-submit" type="submit" value="Login">
     </form>
-    <p class="msg">¿No tienes cuenta?
-      <router-link to="/register">Regístrate</router-link>
-    </p>
   </div>
 </template>
 
 <script>
-
-
-import auth from "@/auth";
+// Asegúrate de que la ruta sea correcta hacia tu archivo auth.js
+import auth from "@/auth"; // O "@/services/auth" dependiendo de tu carpeta
 
 export default {
+  name: "Login",
   data: () => ({
     email: "",
     password: "",
-    error: false
+    error: false,
+    errorMessage: "",
+    loading: false
   }),
   methods: {
-    async login() {
-      try {
-        await auth.login(this.email, this.password);
-        const user = {
-        email: this.email
-        };
-        auth.setUserLogged(user);
+
+
+async login() {
+  this.error = false;
+  this.loading = true;
+  
+  try {
+    // Llamamos al auth.js corregido
+    const response = await auth.login(this.email, this.password);
+    
+    // Reqres devuelve el token en response.data.token
+    if (response.data && response.data.token) {
+        const user = { email: this.email };
+        const token = response.data.token;
+        
+        // ¡OJO! Pasamos ambos argumentos
+        auth.setUserLogged(user, token);
+        
+        // Redirigimos
         this.$router.push("/");
-      } catch (error) {
-        this.error = true;
-      }
     }
+  } catch (err) {
+    console.log(err);
+    this.error = true;
+    // Si Reqres devuelve error, lo mostramos
+    if (err.response && err.response.data && err.response.data.error) {
+        this.errorMessage = err.response.data.error; 
+    } else {
+        this.errorMessage = "Error de conexión o credenciales.";
+    }
+  } finally {
+    this.loading = false;
+  }
+}
+
+
   }
 };
-
 </script>
 
 <style lang="scss" scoped>
@@ -111,9 +140,7 @@ export default {
 .error {
   margin: 1rem 0 0;
   color: #ff4a96;
-}
-.msg {
-  margin-top: 3rem;
+  font-weight: bold;
   text-align: center;
 }
 </style>

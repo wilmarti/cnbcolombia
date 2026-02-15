@@ -47,7 +47,7 @@
             :key="col.id">{{ item[col.id] }}  
           </td>
           <td>
-            <b-button class= "m-1" size="sm" variant="outline-success" v-b-modal.modalEdicion @click="EditarCurso(item.value,item.text,item.ESTADO,item.NumeroHoras,item.TipoDiploma)">Editar</b-button>          
+            <b-button class= "m-1" size="sm" variant="outline-success" v-b-modal.modalEdicion @click="EditarCurso(item.value,item.text,item.ESTADO,item.NumeroHoras,item.TipoDiploma,item)">Editar</b-button>          
             <b-button class="m-1" size="sm" variant="outline-danger" @click="EliminarCurso(item.value)" >Eliminar</b-button>
           </td>
         </tr>
@@ -104,7 +104,7 @@
 
 
 
-    <div id="modal">
+    
     <b-modal
       id="modalEdicion"
       ref="modal"
@@ -115,519 +115,722 @@
       @hidden="resetModal"
       @ok="handleOk"
     >
-    <!-- Hello {{IdEdicion}} -->
-    <form ref="form" @submit.stop.prevent="handleSubmit">
-      <main class="row">
-        <div class="row g-2">
-        <b-form-group class="col-sm m-2"
-          :state="nameState"
-          label="Descripción del Evento"
-          label-for="name-input"
-          invalid-feedback="Name is required"
-        >
-          <b-form-input
-            id="name-input"
-            v-model="nameEditar"
-            :state="nameState"
-            required
-          ></b-form-input>
-        </b-form-group>
+    <b-container fluid>
+      <!-- Hello {{IdEdicion}} -->
+      <form ref="form" @submit.stop.prevent="handleSubmit">        
+          <div class="row">
+            <div class="input-group input-group-sm">
+              <div class="input-group-prepend">
+                <span class="input-group-text" for="name-input" >Descripción del Evento</span>
+             </div>
+              <b-form-input
+                class="form-control mr-1"
+                type="text"
+                id="name-input"
+                v-model="nameEditar"
+                :state=Boolean(nameEditar)
+                invalid-feedback="Name is required"
+                required
+                >
+              </b-form-input>
+            
+            <!-- seleccion de curso -->
+            
+              <div class="input-group-prepend">
+                <span class="input-group-text" for="EstadoCurso">Estado Curso:</span>
+              </div>
+              <b-form-select
+                class="form-control"
+                id="EstadoCurso"
+                v-model="SelectEstado" 
+                :state="SeleccionCursoEstado" 
+                :options="options"
+                invalid-feedback="Debe seleccionar el estado del curso" 
+                required
+                >                
+              </b-form-select>
+            </div>
+          </div>
+          <!--Diploma curso-->
+          <div class="row mt-2">
+            <div class="input-group input-group-sm">
+              <div class="input-group-prepend">
+                <span class="input-group-text" for="diploma">Diploma Curso:</span>
+              </div>
+              <b-form-select
+                class="form-control mr-1"        
+                id="diploma"
+                v-model="Diploma" 
+                descripcion="diploma"
+                :options="optionsDiploma"
+                :state="SeleccionDiploma" 
+                @change="CambiaDiploma"
+                 invalid-feedback="Debe seleccionar diploma del curso"
+                
+                >                     
+              </b-form-select>
+              <!--Elegir archivo-->
+                <b-form-file
+                  class="form-control" 
+                  id="elegirArchivo"
+                  label="Seleccione Diploma:" 
+                  descripcion="Cargue una imagen de diploma"
+                  accept="image/*"
+                  @change="cargaImagen"          
+                  >            
+                </b-form-file>
+            </div>
+            </div>
+          <!--Horas del curso-->
+          <div class="row mt-2">
+            <div class="input-group input-group-sm">
+              <div class="input-group-prepend">
+                <span class="input-group-text" for="horaInput">Horas del Curso:</span>
+              </div>
+              <b-form-input
+                class="form-control mr-1"
+                type="number"
+                id="horaInput"
+                v-model="nameEditarHoras"
+                :state="nameHora"
+                required
+                >
+              </b-form-input>
+              <!-- Selección de texto a configurar-->
+              <div class="input-group-prepend">
+                <span class="input-group-text" for="inputconfiText">Seleccione Texto a configurar:</span>
+              </div>
+              <b-form-select 
+                class="form-control"        
+                id="inputconfiText"
+                v-model="SelectedText"
+                :options="optionConfiTexto" 
+                required
+                >
+              </b-form-select>
+            </div>
+            <div for="horaInput" invalid-feedback="Name is required"></div>
+          </div>
 
-        <!-- seleccion de curso -->
-        <b-form-group class="col-sm m-2"
-          :state="SeleccionCursoEstado"
-          label="Estado Curso:"
-          label-for="estado"
-          invalid-feedback="Debe seleccionar el estado del curso"
-        >
-
-        <b-form-select
-        :state="SeleccionCursoEstado" 
-        v-model="SelectEstado" 
-        id="EstadonCurso"
-        label="Seleccione Estado:" 
-        descripcion="estado"
-        :options="options" 
-        required
-        >
-          <template v-slot:first>
-              <b-form-select-option :value="null" disabled>-- Por favor seleccione un estado --</b-form-select-option>
-          </template>  
-        </b-form-select>
-        </b-form-group>
-        </div>
-        <!--Diploma curso-->
-        <div class="row g-2">
-        <b-form-group class="col-sm m-2"         
-          label="Diploma Curso:"
-          label-for="diploma"
-          invalid-feedback="Debe seleccionar diploma del curso"
-        >
-        <b-form-select         
-        v-model="Diploma" 
-        id="EstadonDiploma"
-        label="Seleccione Diploma:" 
-        descripcion="diploma"
-        :options="optionsDiploma" 
-        @change="CambiaDiploma"
-        required
-        >
-          <template v-slot:first>
-              <b-form-select-option :value="null" disabled>-- Por favor seleccione un diploma --</b-form-select-option>
-          </template>  
-        </b-form-select>
-        </b-form-group>
-
-        <!--Elegir archivo-->
-        <b-form-group class="col-sm m-2"  label="Cargar Imagen:" label-for="elegirArchivo">
-
-        <b-form-file 
-        id="elegirArchivo"
-        label="Seleccione Diploma:" 
-        descripcion="Cargue una imagen de diploma"
-        accept="image/*"
-        @change="cargaImagen" 
-        
-        >
-          <template v-slot:first>
-              <b-form-select-option :value="null" disabled>-- Por favor seleccione un diploma --</b-form-select-option>
-          </template>  
-        </b-form-file>
-        </b-form-group>
-
-      </div>
-        <!--Horas del curso-->
-        <div class="row g-2">
-        <b-form-group class="col-sm m-2"
-          :state="nameHora"
-          label="Horas del Curso"
-          label-for="name-input"
-          invalid-feedback="Name is required"
-        >
-          <b-form-input
-            id="name-input"
-            v-model="nameEditarHoras"
-            :state="nameHora"
-            required
-          ></b-form-input>
-        </b-form-group>
-
-        <!-- Selección de texto a configurar-->
-        <b-form-group class="col-sm m-2"
-        id="confiText"         
-          label="Seleccione Texto a configurar:"
-          label-for="inputconfiText"
-          
-        >
-
-        <b-form-select         
-        v-model="SelectedText" 
-        id="inputconfiText"
-        :state=Boolean(SelectedText)
-        :options="optionConfiTexto" 
-        required
-        >
-          <template v-slot:first>
-              <b-form-select-option :value="null" disabled>-- Por favor seleccione un campo a configuar --</b-form-select-option>
-          </template>  
-        </b-form-select>
-        </b-form-group>
-      </div>
-
-          <b-row>
-            <!-- ****** VISTA PREVIA***-->
-              
-                <div class="card text-sm-center mb-5 text-wrap">
-                  <!-- <div v-if ="imagenSeleccionada">
-                    <img 
-                      class="card-img" 
-                      :src="SelectDiploma" 
-                      alt="certificado"
-                      >              
-                  </div> -->
-               
-                <!--Asegura que solo se muestra la imagen seleccionada desde el input de tipo file si SelectDiploma es una URL de datos (Data URL).-->
-                <div v-if="typeof SelectDiploma === 'string' && SelectDiploma.startsWith('data:image/')">
-                  <img 
-                  m
-                  class="card-img" 
-                  :src="SelectDiploma" 
-                  alt="certificado seleccionada" 
-                  >
-                </div>                
-                <!-- Muestra la imagen de fondo -->
-                  <div class="card-img-overlay">              
-                    <!-- Parrafo nombre curso-->
-                    <p :style="textStyle(formData.ColorNombre, formData.TamañoNombre, formData.PosicionNombre)">
-                      {{ formData.NombreCurso }}
-                    </p>
-                    
-                    <!-- Otros párrafos -->
-                    <p :style="textStyle(formData.ColorCedula, formData.TamañoCedula, formData.PosicionCedula)">
-                      {{ formData.Cedula }}
-                    </p>
-                    <p :style="textStyle(formData.Color1, formData.Tamaño1, formData.Posicion1)">
-                      <small>{{ formData.Texto1 }}</small>
-                    </p>
-                    <p :style="textStyle(formData.Color2, formData.Tamaño2, formData.Posicion2)">
-                      <small>{{ formData.Texto2 }}</small>
-                    </p>
-                    <p :style="textStyle(formData.Color3, formData.Tamaño3, formData.Posicion3)">
-                      <small>{{ formData.Texto3 }}</small>
-                    </p>
-                    <p :style="textStyle(formData.Color4, formData.Tamaño4, formData.Posicion4)">
-                      <small>{{ formData.Texto4 }}</small>
-                    </p>
-                    <p :style="textStyle(formData.ColorFecha, formData.TamañoFecha, formData.PosicionFechaY, formData.PosicionFechaX)">
-                      <small>{{ formData.Fecha }}</small>
-                    </p>             
-                  </div>
-                </div>                
-              
-                    <!-- ******** FORMULARIO CONFIGURACION TEXTO DIPLOMA**********-->
-              <b-col>
-                <form ref="form" @submit.stop.prevent="handleSubmit">
-                <!-- Formulario Inputs Nombre -->
-                <div v-if = "SelectedText === 'nombre'">
-                  <b-form-group
-                    label="Nombre Curso:"
-                    label-for="NombreCurso"
-                    >                  
-                    <b-form-input
+         <!-- ******** FORMULARIO CONFIGURACION TEXTO DIPLOMA**********-->
+            
+        <form id="formConfiDiploma" class="needs-validation" @submit.stop.prevent="handleSubmit">
+              <!-- Formulario Inputs Nombre -->
+              <div v-if = "SelectedText === 'nombre'">
+                <div class="row mt-2">
+                  <div class="input-group input-group-sm">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" for="NombreCurso">Nombre:</span>
+                    </div>
+                    <b-form-input 
+                      class="form-control mr-2"
+                      type="text"
                       id="NombreCurso"
-                      placeholder="Escriba Nombre Curso..."
+                      placeholder="Escriba Nombre"
                       v-model="formData.NombreCurso"
-                      :state=Boolean(formData.NombreCurso)
-                      required
+                    >
+                    </b-form-input> 
+                    <b-form-input
+                    class="form-control mr-2"
+                    type="color"
+                    id="color"
+                    v-model="formData.ColorNombre"
+                    >
+                    </b-form-input>
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" for="fontSize">Tamaño Texto:</span>
+                    </div>
+                    <b-form-input 
+                      class="form-control mr-2"
+                      type="number"
+                      id="fontSize"
+                      min="10"
+                      max="50"
+                      v-model="formData.TamañoNombre"
+                      @input="validateInput('TamañoNombre', 10, 50)"
+                      :state=Boolean(validateInput)
+                     >
+                    </b-form-input>
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" for="positionY">Posición Vertical:</span>
+                    </div>
+                      <b-form-input
+                        class="form-control"
+                        type="range"
+                        min="0"
+                        :max="altoimg"
+                        id="positionY"
+                        v-model="formData.PosicionNombreY"
                       >
                     </b-form-input>
-                  </b-form-group>
-                  
-                  <div class="form-group">
-                    <label for="color" class="form-label">Color:</label>
-                    <input
-                      class="form-control form-control-color m-3"
-                      type="color"
-                      id="color"
-                      placeholder="Configurar Texto"
-                      v-model="formData.ColorNombre"
-                    >
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label" for="fontSize">Tamaño de letra:</label>
-                    <input
-                      class="form-range"
-                      type="range"
-                      min="20"
-                      max="60"
-                      id="fontSize"
-                      v-model="formData.TamañoNombre"
-                    >
-                  </div>            
-                  <div class="form-group">
-                    <label for="position">Posición:</label>
-                    <input
-                      class="form-range"
-                      type="range"
-                      min="100"
-                      max="900"
-                      id="position"
-                      v-model="formData.PosicionNombre"
-                    >
-                  </div>
-                </div>
-                <!-- Formulario Inputs Identificación -->
-                <div v-if="SelectedText === 'identi'">
-                  <div class="form-group">
-                    <label class="form-label" for="cedula">Cédula:</label>
-                    <input
+                    <b-form-input
                       class="form-control"
                       type="number"
+                      id="positionY"
+                      v-model="formData.PosicionNombreY"
+                      @input="validateInput('PosicionNombreY', 0, 'altoimg')"
+                      :state=Boolean(validateInput)
+                      >
+                    </b-form-input>
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" for="positionX">Posición Horizontal:</span>
+                    </div>
+                      <b-form-input
+                        class="form-control"
+                        type="range"
+                        min="0"
+                        :max="anchoimg"
+                        id="positionX"
+                        v-model="formData.PosicionNombreX"
+                        >
+                      </b-form-input>
+                      <b-form-input
+                        class="form-control"
+                        type="number"
+                        id="positionX"
+                        v-model="formData.PosicionNombreX"
+                        @input="validateInput('PosicionNombreX', 0, 'altoimg')"
+                        :state=Boolean(validateInput)
+                        >
+                      </b-form-input>
+                  </div>                  
+                </div>                
+              </div>
+              <!-- Formulario Inputs Identificación -->
+              <div v-if="SelectedText === 'identi'">
+                <div class="row mt-2">
+                  <div class="input-group input-group-sm">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" for="cedula">Cédula:</span>
+                    </div>
+                    <b-form-input
+                      class="form-control mr-2"
+                      type="text"
+                      id="cedula"
                       placeholder="Escriba Identificación..."
                       v-model="formData.Cedula"
-                      :state=Boolean(formData.Cedula)
-                    >
-                  </div>
-                  <div class="form-group">
-                    <label for="colorId" class="form-label">Color:</label>
-                    <input
-                      class="form-control form-control-color m-3"
+                      >
+                    </b-form-input>                 
+                    <b-form-input
+                      class="form-control mr-2"
                       type="color"
                       id="colorIdenti"
-                      placeholder="Configurar Texto"
-                      v-model="formData.ColorCedula"                      >
-                    </div>
-                  <div class="form-group">
-                    <label class="form-label" for="fontSizeId">Tamaño de letra:</label>
-                    <input
-                      class="form-range"
-                      type="range"
-                      min="20"
-                      max="60"
-                      id="fontSizeIdenti"
+                      v-model="formData.ColorCedula" 
+                      >
+                    </b-form-input>
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" for="fontSizeId">Tamaño Texto:</span>
+                  </div>
+                    <b-form-input
+                      class="form-contol mr-2"
+                      type="number"
+                      id="fontSizeId"
+                      min="10"
+                      max="50"
                       v-model="formData.TamañoCedula"
-                      >
-                    </div>
-                  <div class="form-group">
-                    <label for="positionIdenti">Posición:</label>
-                    <input
-                      class="form-range"
-                      type="range"
-                      min="100"
-                      max="900"
-                      id="positionIdenti"
-                      v-model="formData.PosicionCedula"
-                      >
-                    </div>
+                      @input="validateInput('TamañoCedula', 10, 50)"
+                      :state=Boolean(validateInput)
+                     >
+                    </b-form-input>
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" for="positionIdY">Posición Vertical:</span>
                   </div>
-                <!-- Formulario Input Fecha -->
-                <div v-if="SelectedText === 'fecha'">
-                  <div class="form-group">
-                    <label for="date">Fecha:</label>
-                    <input
+                    <b-form-input
                       class="form-control"
-                      type="date"
-                      id="date"
-                      v-model="formData.Fecha"
-                    >
-                  </div>
-                  <div class="form-group">
-                    <label for="colorFecha" class="form-label">Color:</label>
-                    <input
-                      class="form-control form-control-color m-3"
-                      type="color"
-                      id="colorFecha"
-                      placeholder="Configurar Texto"
-                      v-model="formData.ColorFecha"
-                    >
-                    <div class="form-group">
-                      <label class="form-label" for="fontSizeFecha">Tamaño de letra:</label>
-                      <input
-                        class="form-range"
-                        type="range"
-                        min="15"
-                        max="60"
-                        id="fontSizeFecha"
-                        v-model="formData.TamañoFecha"
+                      type="range"
+                      min="0"
+                      :max="altoimg"
+                      id="positionIdY"
+                      v-model="formData.PosicionCedulaY"
                       >
-                    </div>            
-                  </div>
-                  <div class="form-group">
-                    <label for="positionFecha">Posición Vertical:</label>
-                    <input
-                      class="form-range"
-                      min="250"
-                      max="900"
-                      type="range"
-                      id="positionFecha"
-                      v-model="formData.PosicionFechaY"
-                    >
-                  </div>
-                  <div class="form-group">
-                    <label for="positionFecha">Posición Horizontal:</label>
-                    <input
-                      class="form-range"
-                      type="range"
-                      id="positionFecha"
-                      v-model="formData.PosicionFechaX"
-                    >
+                    </b-form-input>
+                    <b-form-input
+                      class="form-control"
+                      type="number"
+                      id="positionIdY"
+                      v-model="formData.PosicionCedulaY"
+                      @input="validateInput('PosicionCedulaY', 0, 'altoimg')"
+                      :state=Boolean(validateInput)
+                      >
+                    </b-form-input>
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" for="positionIdX">Posición Horizontal:</span>
+                    </div>
+                      <b-form-input
+                        class="form-control"
+                        type="range"
+                        min="0"
+                        :max="anchoimg"
+                        id="positionIdX"
+                        v-model="formData.PosicionCedulaX"
+                        >
+                      </b-form-input>
+                      <b-form-input
+                        class="form-control"
+                        type="number"
+                        id="positionIdX"
+                        v-model="formData.PosicionCedulaX"
+                        @input="validateInput('PosicionFechaX', 0, 'anchoimg')"
+                        :state=Boolean(validateInput)
+                        >
+                      </b-form-input>
                   </div>
                 </div>
-                <!-- Formulario Input Texto1 -->
-                <div v-if="SelectedText === 'texto1'">
-                    <div class="form-group">
-                      <label for="Texto1">Texto 1:</label>
-                      <input
-                        class="form-control"
+              </div>  
+              <!-- Formulario Input Texto1 -->
+              <div v-if="SelectedText === 'texto1'">
+                <div class="row mt-2">
+                  <div class="input-group input-group-sm">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" for="Texto1">Texto 1:</span>
+                    </div>
+                      <b-form-input
+                        class="form-control mr-2"
                         type="text"
                         id="Texto1"
+                        placeholder="Escriba Texto 1"
                         v-model="formData.Texto1"
-                        :state=Boolean(formData.Texto1)
-                      >
-                    </div>
-                    <div class="form-group">
-                      <label for="colorTexto1" class="form-label">Color:</label>
-                      <input
-                        class="form-control form-control-color m-3"
+                        >
+                      </b-form-input>
+                      <b-form-input
+                        class="form-control mr-2"
                         type="color"
                         id="colorTexto1"
-                        placeholder="Configurar Texto"
                         v-model="formData.Color1"
-                      >
+                        >
+                      </b-form-input>                  
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" for="fontSizeTexto1">Tamaño Texto:</span>
                     </div>
-                    <div class="form-group">
-                      <label class="form-label" for="fontSizeTexto1">Tamaño de letra:</label>
-                      <input
-                        class="form-range"
-                        type="range"
-                        min="20"
-                        max="60"
+                      <b-form-input
+                        class="form-control mr-2"
+                        type="number"
                         id="fontSizeTexto1"
+                        min="10"
+                        max="50"
                         v-model="formData.Tamaño1"
-                      >
+                        @input="validateInput('Tamaño1', 10, 50)"
+                        :state=Boolean(validateInput)
+                        >
+                      </b-form-input>
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" for="positionTexto1Y">Posición Vertical:</span>
                     </div>
-                    <div class="form-group">
-                      <label for="positionTexto1">Posición:</label>
-                      <input
-                        class="form-range"
+                      <b-form-input
+                        class="form-control"
                         type="range"
-                        min="250"
-                        max="900"
-                        id="positionTexto1"
-                        v-model="formData.Posicion1"
-                      >
-                      <input
+                        min="0"
+                        :max="altoimg"
+                        id="positionTexto1Y"
+                        v-model="formData.Posicion1Y"
+                        >
+                      </b-form-input>
+                      <b-form-input
                         class="form-control"
-                        type="input"
-                        id="positionTexto1"
-                        v-model="formData.Posicion1"
-                      >
+                        type="number"
+                        id="positionTexto1Y"
+                        v-model="formData.Posicion1Y"
+                        @input="validateInput('Posicion1Y', 0, 'altoimg')"
+                        :state=Boolean(validateInput)
+                        >
+                      </b-form-input>
+                      <div class="input-group-prepend">
+                      <span class="input-group-text" for="position1X">Posición Horizontal:</span>
                     </div>
-                  </div>
-                <!-- Formulario Input Texto2 --> 
-                <div v-if="SelectedText === 'texto2'">
-                    <div class="form-group">
-                      <label for="Texto1">Texto 2:</label>
-                      <input
+                      <b-form-input
                         class="form-control"
+                        type="range"
+                        min="0"
+                        :max="anchoimg"
+                        id="position1X"
+                        v-model="formData.Posicion1X"
+                        >
+                      </b-form-input>
+                      <b-form-input
+                        class="form-control"
+                        type="number"
+                        id="position1x"
+                        v-model="formData.Posicion1X"
+                        @input="validateInput('Posicion1X', 0, 'anchoimg')"
+                        :state=Boolean(validateInput)
+                        >
+                      </b-form-input>  
+                  </div>
+                </div>
+              </div>
+              <!-- Formulario Input Texto2 --> 
+              <div v-if="SelectedText === 'texto2'">
+                <div class="row mt-2">
+                  <div class="input-group input-group-sm">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" for="Texto1">Texto 2:</span>
+                    </div>
+                      <b-form-input
+                        class="form-control mr-2"
                         type="text"
                         id="Texto2"
+                        placeholder="Escriba Texto 2"
                         v-model="formData.Texto2"
-                        :state=Boolean(formData.Texto2)
-                      >
-                    </div>
-                    <div class="form-group">
-                      <label for="colorTexto2" class="form-label">Color:</label>
-                      <input
-                        class="form-control form-control-color m-3"
+                        >
+                      </b-form-input>                    
+                      <b-form-input
+                        class="form-control mr-2"
                         type="color"
                         id="colorTexto2"
-                        placeholder="Configurar Texto"
-                        v-model="formData.Color2"                      >
+                        v-model="formData.Color2"
+                        >
+                      </b-form-input>
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" for="fontSizeTexto1">Tamaño Texto:</span>
                     </div>
-                    <div class="form-group">
-                      <label class="form-label" for="fontSizeTexto1">Tamaño de letra:</label>
-                      <input
-                        class="form-range"
-                        type="range"
-                        min="20"
-                        max="60"
+                      <b-form-input
+                        class="form-control mr-2"
+                        type="number"
                         id="fontSizeTexto1"
+                        min="10"
+                        max="50"
                         v-model="formData.Tamaño2"
-                      >
+                        @input="validateInput('Tamaño2', 10, 50)"
+                        :state=Boolean(validateInput)
+                        >
+                      </b-form-input>
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" for="positionTexto2Y">Posición Vertical:</span>
                     </div>
-                    <div class="form-group">
-                      <label for="positionTexto2">Posición:</label>
-                      <input
-                        class="form-range"
-                        type="range"
-                        min="300"
-                        max="900"
-                        id="positionTexto2"
-                        v-model="formData.Posicion2"
-                      >
-                    </div>
-                </div>
-                        <!-- Formulario Input Texto3 -->
-                    <div v-if="SelectedText === 'texto3'">
-                    <div class="form-group">
-                      <label for="Texto3">Texto 3:</label>
-                      <input
+                      <b-form-input
                         class="form-control"
-                        type="text"
-                        id="Texto1"
-                        v-model="formData.Texto3"
-                        :state=Boolean(formData.Texto3)
-                      >
-                    </div>
-                    <div class="form-group">
-                      <label for="colorTexto3" class="form-label">Color:</label>
-                      <input
-                        class="form-control form-control-color m-3"
-                        type="color"
-                        id="colorTexto3"
-                        placeholder="Configurar Texto"
-                        v-model="formData.Color3"
-                      >
-                    </div>
-                    <div class="form-group">
-                      <label class="form-label" for="fontSizeTexto3">Tamaño de letra:</label>
-                      <input
-                        class="form-range"
                         type="range"
-                        min="20"
-                        max="60"
-                        id="fontSizeTexto3"
-                        v-model="formData.Tamaño3"
-                      >
+                        min="0"
+                        :max="altoimg"
+                        id="positionTexto2Y"
+                        v-model="formData.Posicion2Y"
+                        >
+                      </b-form-input>
+                      <b-form-input
+                        class="form-control"
+                        type="number"
+                        id="positionTexto2"
+                        v-model="formData.Posicion2Y"
+                        @input="validateInput('Posicion2Y', 0, 'altoimg')"
+                        :state=Boolean(validateInput)
+                        >
+                      </b-form-input>
+                      <div class="input-group-prepend">
+                      <span class="input-group-text" for="positionTexto2X">Posición Horizontal:</span>
                     </div>
-                    <div class="form-group">
-                      <label for="positionTexto3">Posición:</label>
-                      <input
-                        class="form-range"
+                      <b-form-input
+                        class="form-control"
                         type="range"
-                        min="300"
-                        max="900"
-                        id="positionTexto3"
-                        v-model="formData.Posicion3"
-                      >
+                        min="0"
+                        :max="anchoimg"
+                        id="positionTexto2X"
+                        v-model="formData.PosicionTexto2X"
+                        >
+                      </b-form-input>
+                      <b-form-input
+                        class="form-control"
+                        type="number"
+                        id="positionFecha"
+                        v-model="formData.PosicionTexto2X"
+                        @input="validateInput('PosicionTexto2X', 0, 'anchoimg')"
+                        :state=Boolean(validateInput)
+                        >
+                      </b-form-input>
+                  </div>
+                </div>
+              </div>
+                      <!-- Formulario Input Texto3 -->
+                  <div v-if="SelectedText === 'texto3'">
+                    <div class="row mt-2">
+                      <div class="input-group input-group-sm">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text" for="Texto3">Texto 3:</span>
+                        </div>
+                          <b-form-input
+                            class="form-control mr-2"
+                            type="text"
+                            id="Texto3"
+                            placeholder="Escriba Texto 3"
+                            v-model="formData.Texto3"
+                            >
+                          </b-form-input>
+                          <b-form-input
+                            class="form-control mr-2"
+                            type="color"
+                            id="colorTexto3"
+                            v-model="formData.Color3"
+                            >
+                          </b-form-input>
+                        <div class="input-group-prepend">
+                          <span class="input-group-text" for="fontSizeTexto3">Tamaño Texto:</span>
+                        </div>
+                          <b-form-input
+                            class="form-control mr-2"
+                            type="number"
+                            id="fontSizeTexto3"
+                            min="10"
+                            max="50"
+                            v-model="formData.Tamaño3"
+                            @input="validateInput('Tamaño3', 10, 50)"
+                            :state=Boolean(validateInput)
+                            >
+                          </b-form-input>
+                        <div class="input-group-prepend">
+                          <span class="input-group-text" for="positionTexto3">Posición:</span>
+                        </div>
+                          <b-form-input
+                            class="form-control"
+                            type="range"
+                            min="0"
+                            :max="altoimg"
+                            id="positionTexto3"
+                            v-model="formData.Posicion3Y"
+                            >
+                          </b-form-input>
+                          <b-form-input
+                            class="form-control"
+                            type="number"
+                            id="positionTexto3"
+                            v-model="formData.Posicion3Y"
+                            @input="validateInput('Posicion3Y', 0, 'anchoimg')"
+                            :state=Boolean(validateInput)
+                            >
+                          </b-form-input>
+                          <div class="input-group-prepend">
+                      <span class="input-group-text" for="positionTexto3X">Posición Horizontal:</span>
+                    </div>
+                      <b-form-input
+                        class="form-control"
+                        type="range"
+                        min="0"
+                        :max="anchoimg"
+                        id="positionTextoeX"
+                        v-model="formData.Posicion3X"
+                        >
+                      </b-form-input>
+                      <b-form-input
+                        class="form-control"
+                        type="number"
+                        id="positionFecha"
+                        v-model="formData.Posicion3X"
+                        @input="validateInput('Posicion3X', 0, 'anchoimg')"
+                        :state=Boolean(validateInput)
+                        >
+                      </b-form-input>
+                      </div>
                     </div>
                   </div> 
-                   <!-- Formulario Input Texto4 -->
-                   <div v-if="SelectedText === 'texto4'">
-                    <div class="form-group">
-                      <label for="Texto4">Texto 4:</label>
-                      <input
+                <!-- Formulario Input Texto4 -->
+                <div v-if="SelectedText === 'texto4'">
+                  <div class="row mt-2">
+                    <div class="input-group input-group-sm">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" for="Texto4">Texto 4:</span>
+                      </div>
+                        <b-form-input
+                          class="form-control mr-2"
+                          type="text"
+                          id="Texto4"
+                          placeholder="Escriba Texto 4"
+                          v-model="formData.Texto4"
+                          >
+                        </b-form-input>
+                        <b-form-input
+                          class="form-control mr-2"
+                          type="color"
+                          id="colorTexto4"
+                          v-model="formData.Color4"
+                         >
+                        </b-form-input>
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" for="fontSizeTexto4">Tamaño Texto:</span>
+                      </div>
+                        <b-form-input
+                          class="form-control mr-2"
+                          type="number"
+                          id="fontSizeTexto4"
+                          min="10"
+                          max="50"
+                          v-model="formData.Tamaño4"
+                          @input="validateInput('Tamaño4', 10, 50)"
+                          :state=Boolean(validateInput)
+                          >
+                        </b-form-input>
+                      <div class="input-group-prepend">
+                        <label class="input-group-text" for="positionTexto4">Posición Vertical:</label>
+                      </div>
+                        <b-form-input
+                          class="form-control"
+                          type="range"
+                          min="0"
+                          :max="altoimg"
+                          id="positionTexto4"
+                          v-model="formData.Posicion4Y"
+                          >
+                        </b-form-input>
+                        <b-form-input
+                          class="form-control"
+                          type="number"
+                          id="positionTexto4"
+                          v-model="formData.Posicion4Y"
+                          @input="validateInput('Posicion4Y', 0, 'altoimg')"
+                          :state=Boolean(validateInput)
+                          >
+                        </b-form-input>
+                        <div class="input-group-prepend">
+                      <span class="input-group-text" for="positionFecha">Posición Horizontal:</span>
+                    </div>
+                      <b-form-input
                         class="form-control"
-                        type="text"
-                        id="Texto1"
-                        v-model="formData.Texto4"
-                        :state=Boolean(formData.Texto4)
-                      >
+                        type="range"
+                        min="0"
+                        :max="anchoimg"
+                        id="positionFecha"
+                        v-model="formData.Posicion4X"
+                        >
+                      </b-form-input>
+                      <b-form-input
+                        class="form-control"
+                        type="number"
+                        id="positionFecha"
+                        v-model="formData.Posicion4X"
+                        @input="validateInput('Posicion4X', -500, 500)"
+                        :state=Boolean(validateInput)
+                        >
+                      </b-form-input>
                     </div>
-                    <div class="form-group">
-                      <label for="colorTexto4" class="form-label">Color:</label>
-                      <input
-                        class="form-control form-control-color m-3"
+                  </div>
+                </div> 
+                
+              <!-- Formulario Input Fecha -->
+              <div v-if="SelectedText === 'fecha'">
+                <div class="row mt-2">
+                  <div class="input-group input-group-sm">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" for="date">Fecha:</span>
+                    </div>
+                      <b-form-input
+                        class="form-control mr-2"
+                        type="date"
+                        id="date"
+                        v-model="formData.Fecha"
+                        >
+                      </b-form-input>
+                      <b-form-input
+                        class="form-control mr-2"
                         type="color"
-                        id="colorTexto4"
+                        id="colorFecha"
                         placeholder="Configurar Texto"
-                        v-model="formData.Color4"
-                      >
+                        v-model="formData.ColorFecha"
+                        >
+                      </b-form-input>
+                    <div class="input-group-prepend">
+                      <label class="input-group-text" for="fontSizeFecha">Tamaño de letra:</label>
+                    </div>            
+                      <b-form-input
+                        class="form-controlcmr-2"
+                        type="number"
+                        id="fontSizeFecha"
+                        min="10"
+                        max="50"
+                        v-model="formData.TamañoFecha"
+                        @input="validateInput('TamañoFecha', 10, 50)"
+                        :state=Boolean(validateInput)
+                        >
+                      </b-form-input>
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" for="positionFecha">Posición Vertical:</span>
                     </div>
-                    <div class="form-group">
-                      <label class="form-label" for="fontSizeTexto4">Tamaño de letra:</label>
-                      <input
-                        class="form-range"
+                      <b-form-input
+                        class="form-control"
+                        min="0"
+                        :max="altoimg"
                         type="range"
-                        min="20"
-                        max="60"
-                        id="fontSizeTexto4"
-                        v-model="formData.Tamaño4"
-                      >
+                        id="positionFecha"
+                        v-model="formData.PosicionFechaY"
+                        >
+                      </b-form-input>
+                      <b-form-input
+                        class="form-control mr-2"
+                        type="number"
+                        id="positionFecha"
+                        v-model="formData.PosicionFechaY"
+                        @input="validateInput('PosicionFechaY', 0, this.altoimg)"
+                        :state=Boolean(validateInput)
+                        >
+                      </b-form-input>
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" for="positionFecha">Posición Horizontal:</span>
                     </div>
-                    <div class="form-group">
-                      <label for="positionTexto4">Posición:</label>
-                      <input
-                        class="form-range"
+                      <b-form-input
+                        class="form-control"
                         type="range"
-                        min="300"
-                        max="900"
-                        id="positionTexto4"
-                        v-model="formData.Posicion4"
-                      >
-                    </div>
-                  </div>         
-                </form>      
-              </b-col>
-          </b-row>
-      
-      
+                        min="0"
+                        :max="anchoimg"
+                        id="positionFecha"
+                        v-model="formData.PosicionFechaX"
+                        >
+                      </b-form-input>
+                      <b-form-input
+                        class="form-control"
+                        type="number"
+                        id="positionFecha"
+                        v-model="formData.PosicionFechaX"
+                        @input="validateInput('PosicionFechaX', -500, 500)"
+                        :state=Boolean(validateInput)
+                        >
+                      </b-form-input>
+                  </div>
+                </div>
+              </div>        
+        </form> 
 
-      </main>
+        <!-- ****** VISTA PREVIA***-->
+        <b-row class="container justify-content-md-center">
+              <div class="card text-sm-center text-wrap">
+                
+              <!--Asegura que solo se muestra la imagen seleccionada desde el input de tipo file si SelectDiploma es una URL de datos (Data URL).-->
+              <div v-if="typeof SelectDiploma === 'string' && SelectDiploma.startsWith('data:image/')">
+                <img
+                fluid-grow
+                class="card-img" 
+                :src="SelectDiploma" 
+                alt="certificado seleccionada" 
+                >
+              </div>                
+              <!-- Muestra la imagen de fondo -->
+                <div class="card-img-overlay p-0">              
+                  <!-- Parrafo nombre curso-->
+                  <p :style="textStyle(formData.ColorNombre, formData.TamañoNombre, formData.PosicionNombreY, formData.PosicionNombreX)">
+                    {{ formData.NombreCurso }}
+                  </p>
+                  
+                  <!-- Otros párrafos -->
+                  <p :style="textStyle(formData.ColorCedula, formData.TamañoCedula, formData.PosicionCedulaY, formData.PosicionCedulaX)">
+                    {{ formData.Cedula }}
+                  </p>
+                  <p :style="textStyle(formData.Color1, formData.Tamaño1, formData.Posicion1Y, formData.Posicion1x)">
+                    {{ formData.Texto1 }}
+                  </p>
+                  <p :style="textStyle(formData.Color2, formData.Tamaño2, formData.Posicion2Y, formData.Posicion2x)">
+                    {{ formData.Texto2 }}
+                  </p>
+                  <p :style="textStyle(formData.Color3, formData.Tamaño3, formData.Posicion3Y, formData.Posicion3x)">
+                    {{ formData.Texto3 }}
+                  </p>
+                  <p :style="textStyle(formData.Color4, formData.Tamaño4, formData.Posicion4Y, formData.Posicion4x)">
+                    {{ formData.Texto4 }}
+                  </p>
+                  <p :style="textStyle(formData.ColorFecha, formData.TamañoFecha, formData.PosicionFechaY, formData.PosicionFechaX)">
+                    {{ formData.Fecha }}
+                  </p>             
+                </div>
+              </div>   
+        </b-row>
       </form>
+    </b-container>
     </b-modal>
-    </div>
+    
 
     <br/>
     <br/>
@@ -663,6 +866,8 @@ export default {
   data(){
       return {
       //caracteristicas del scroll
+      anchoimg:0,
+      altoimg:0,
       Diploma:"",
       scrollVertical: true,
 			scrollHorizontal: true,
@@ -675,44 +880,50 @@ export default {
       //
       //v-model formulario
       formData: {        
-        NombreCurso: '',
-        TamañoNombre:'20',
+        NombreCurso: 'Nombre por defecto',
+        TamañoNombre:'10',
         ColorNombre:'#000000',
-        PosicionNombre:'0',
+        PosicionNombreY:'0',
+        PosicionNombreX:'',
         //******** */
-        Cedula:'',
-        TamañoCedula:'20',
+        Cedula:'XX.XXX.XXX',
+        TamañoCedula:'10',
         ColorCedula:'#000000',
-        PosicionCedula:'0',
+        PosicionCedulaY:'0',
+        PosicionCedulaX:'',
         /********* */
-        Fecha:'',
-        TamañoFecha:'20',
+        Fecha:'DD/MM/AAAA',
+        TamañoFecha:'10',
         ColorFecha:'#000000',
         PosicionFechaY:'0',
         PosicionFechaX:'0',
         /********* */ 
         Texto1: '',
-        Tamaño1: '20',
+        Tamaño1: '10',
         Color1: '#000000',
-        Posicion1: '0',
+        Posicion1Y: '0',
+        Posicion1X:'0',
         /********* */
         Texto2: '',
-        Tamaño2: '20',
+        Tamaño2: '10',
         Color2: '#000000',
-        Posicion2: '0',
+        Posicion2Y: '0',
+        Posicion2X:'0',
         /********* */
         Texto3: '',
-        Tamaño3: '20',
+        Tamaño3: '10',
         Color3: '#000000',
-        Posicion3: '0',
+        Posicion3Y: '0',
+        Posicion3X:'0',
         /********* */
         /********* */
         Texto4: '',
-        Tamaño4: '20',
+        Tamaño4: '10',
         Color4: '#000000',
-        Posicion4: '0',
+        Posicion4Y: '0',
+        Posicion4X:'0',
         /********* */        
-        FondoDiploma:[],
+      
       },
         id:'',
         NuevoCurso:'',
@@ -742,7 +953,6 @@ export default {
           { value: '1', text: 'ACTIVO' },
           { value: '0', text: 'INACTIVO' }
         ],  
-        optionsDiploma:[],
 /*         optionsDiploma:[
           { value: null, text: 'Por favor seleccione un diploma' },
           { value: '1', text: 'NORMAL' },
@@ -761,7 +971,7 @@ export default {
                  ],
         nameHora:null,
         optionConfiTexto:[
-        {value: null, text: "Seleccione Texto", disabled: true},
+        {value: null, text: "Por favor seleccione un campo a configuar", disabled: true},
         {value:"nombre",text: "Nombre"},
         {value:"identi",text: "Identificación"},
         {value:"texto1",text: "Texto1"},
@@ -791,9 +1001,10 @@ export default {
      },  
      
      getDiplomas(){
-      axios.get(process.env.VUE_APP_API_URL+"/ListaDiploma").then (response =>{
+      axios.get("https://cnbcolombia.com/node/ApiACNB/cursos"+"/ListaDiploma").then (response =>{
         this.ListDiplomas = response.data
         this.optionsDiploma = response.data
+        console.log("ListDiplomas222",process.env.VUE_APP_API_URL)
         console.log("ListDiplomas",response.data)
       })
       .catch (e => console.log("error",e))     
@@ -801,8 +1012,9 @@ export default {
 
     /*************Methodo que llama la API para llenar array de cursos virtuales del CNB */
     getCursos(){
-      axios.get(process.env.VUE_APP_API_URL).then (response =>{
+      axios.get("https://cnbcolombia.com/node/ApiACNB/cursos").then (response =>{
         this.cursovirtual = response.data
+        console.log("url",process.env.VUE_APP_API_URL)
         console.log("cursos",response.data)
       })
       .catch (e => console.log("error",e))
@@ -810,7 +1022,7 @@ export default {
     },
     /*************Methodo que llamar a la API utilizado para eliminar el curso seleccionado */
     AñadirCursos(NuevoCurso){
-      axios.post(process.env.VUE_APP_API_URL,{NuevoCurso}).then (response =>{
+      axios.post("https://cnbcolombia.com/node/ApiACNB/cursos",{NuevoCurso}).then (response =>{
           
           //console.log(response)
 
@@ -842,7 +1054,7 @@ export default {
           }
     },
 
-    EditarCurso (index,text,estado,Horas,diploma)
+    EditarCurso (index,text,estado,Horas,diploma,data)
     { 
 
       //console.log("este es el diploma:", diploma)
@@ -853,6 +1065,46 @@ export default {
         this.nameEditar = text
         this.nameEditarHoras = Horas
         this.Diploma= diploma
+
+        this.formData.PosicionNombreY = data.PosicionNombre
+        this.formData.ColorNombre = data.ColorNombre
+        this.formData.TamañoNombre = data.TamañoNombre
+
+        this.formData.PosicionCedulaY = data.PosicionId
+        this.formData.ColorCedula = data.ColorId
+        this.formData.TamañoCedula = data.TamañoId
+
+        this.formData.PosicionFechaY = data.PosicionFecha
+        this.formData.ColorFecha = data.ColorFecha
+        this.formData.TamañoFecha = data.TamañoFecha
+
+        this.formData.Texto1 = data.Texto1
+        this.formData.Posicion1Y = data.Posicion1
+        this.formData.Color1 = data.Color1
+        this.formData.Tamaño1 = data.Tamaño1
+
+        this.formData.Texto2 = data.Texto2
+        this.formData.Posicion2Y = data.Posicion2
+        this.formData.Color2 = data.Color2
+        this.formData.Tamaño2 = data.Tamaño2
+
+        this.formData.Texto3 = data.Texto3
+        this.formData.Posicion3Y = data.Posicion3
+        this.formData.Color3 = data.Color3
+        this.formData.Tamaño3 = data.Tamaño3
+
+        this.formData.Texto4 = data.Texto4
+        this.formData.Posicion4Y = data.Posicion4
+        this.formData.Color4 = data.Color4
+        this.formData.Tamaño4 = data.Tamaño4        
+
+
+
+
+       // this.formData.TamañoNombre = this.cursovirtual 
+
+        console.log("index:",this.formData.PosicionNombreY)
+
 
         this.CambiaDiploma()
         
@@ -928,37 +1180,37 @@ export default {
       //--
       const Te1 = this.formData.Texto1
       const Ta1 = this.formData.Tamaño1
-      const Po1 = this.formData.Posicion1
+      const Po1 = this.formData.Posicion1Y
       const Co1 = this.formData.Color1
       //--
       //--
       const Te2 = this.formData.Texto2
       const Ta2 = this.formData.Tamaño2
-      const Po2 = this.formData.Posicion2
+      const Po2 = this.formData.Posicion2Y
       const Co2 = this.formData.Color2
       //--
       //--
       const Te3 = this.formData.Texto3
       const Ta3 = this.formData.Tamaño3
-      const Po3 = this.formData.Posicion3
+      const Po3 = this.formData.Posicion3Y
       const Co3 = this.formData.Color3
 
       
       const Te4 = this.formData.Texto4
       const Ta4 = this.formData.Tamaño4
-      const Po4 = this.formData.Posicion4
+      const Po4 = this.formData.Posicion4Y
       const Co4 = this.formData.Color4      
       //--      
       //--
       //const NomCur = formData.NombreCurso
       const TaNom = this.formData.TamañoNombre
-      const PoNom = this.formData.PosicionNombre
+      const PoNom = this.formData.PosicionNombreY
       const CoNom = this.formData.ColorNombre
       //--
       //--
       //const Cedu = formData.Cedula
       const TaCedu = this.formData.TamañoCedula
-      const PoCedu = this.formData.PosicionCedula
+      const PoCedu = this.formData.PosicionCedulaY
       const CoCedu = this.formData.ColorCedula
       //--
       //--
@@ -1066,9 +1318,10 @@ export default {
       return {
         color: color,
         fontSize: size + 'px',
-        position: 'relative',
+        position: 'absolute',
         top: top + 'px',
-        left: left + 'px'
+        left: left + 'px',
+        marginBottom: '0'
       };
     },
      // Función para guardar la imagen
@@ -1091,19 +1344,72 @@ export default {
       }); */
     },
 
-    CambiaDiploma(){
+    async CambiaDiploma(){
 
+      //console.log("Tamaño:",this.Diploma.length)
+
+    if(this.Diploma.length === undefined)
+    {
       this.SelectDiploma = this.Diploma
+      console.log("this.SelectDiploma:",this.SelectDiploma)
+
 
       this.FondoImg = this.ListDiplomas.filter((item) => item.value ===this.SelectDiploma)
       this.SelectDiploma = this.FondoImg[0].FondoDiploma
       this.CodigoDiploma = this.FondoImg[0].value
       this.NombreDiploma = this.FondoImg[0].text
 
-      console.log("valor:",this.CodigoDiploma, "Nombre:",this.NombreDiploma)
+     
+      console.log("this.FondoImg:",this.FondoImg)
+      console.log("this.Diploma:",this.Diploma)
+
+      const dimensions = await this.getImageDimensions(this.SelectDiploma);
+      this.anchoimg = dimensions.width
+      this.altoimg = dimensions.height
+      // console.log('Ancho:', dimensions.width, 'px');
+      // console.log('Alto:', dimensions.height, 'px');
+
+      //console.log("valor:",this.CodigoDiploma, "Nombre:",this.NombreDiploma)
+    }else{
+      this.SelectDiploma = this.Diploma
+    }
+
+
+
     },
-    
-    },
+
+
+    getImageDimensions(base64Image) {
+    return new Promise((resolve, reject) => {
+        const img = new Image(); // Crear un elemento de imagen
+        
+        img.onload = () => {
+            // Obtener las dimensiones una vez que la imagen se cargue
+            const width = img.width;
+            const height = img.height;
+            resolve({ width, height });
+        };
+        
+        img.onerror = () => {
+            reject(new Error("Error al cargar la imagen"));
+        };
+        
+        // Asignar el contenido Base64 al src del elemento Image
+        img.src = base64Image;
+    });
+},
+
+
+    validateInput(field, min, max) {
+      if (this.formData[field] < min) { 
+           this.formData[field] = min; 
+      } else if (this.formData[field] > max){
+        this.formData[field] = max;
+      } 
+  },
+},
+  
+  
 
       computed:{
         ValidarInputNumerico(){
@@ -1114,6 +1420,7 @@ export default {
             //return this.participante.filter((item) => item.nota > 4);
             return this.curso.filter((item) => item.value != null);
         },
+        
 
 
         },
@@ -1196,5 +1503,3 @@ table.freezeFirstColumn tbody th:first-child {
 	font-family: FontAwesome;
 }
 </style>
-
-
